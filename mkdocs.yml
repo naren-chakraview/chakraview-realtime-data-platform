@@ -1,0 +1,116 @@
+site_name: Chakra Commerce — Real-Time Data Platform
+site_description: >
+  Contract-first real-time data platform: Debezium CDC → Kafka → Flink → Apache Iceberg →
+  DuckDB. Kappa architecture, medallion layers, data product ownership.
+site_url: https://naren-chakraview.github.io/chakraview-realtime-data-platform/
+repo_name: naren-chakraview/chakraview-realtime-data-platform
+repo_url: https://github.com/naren-chakraview/chakraview-realtime-data-platform
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  palette:
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: teal
+      accent: amber
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: teal
+      accent: amber
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+  font:
+    text: Inter
+    code: JetBrains Mono
+  logo: assets/logo.svg
+  favicon: assets/logo.svg
+  icon:
+    repo: fontawesome/brands/github
+  features:
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.indexes
+    - navigation.top
+    - toc.follow
+    - search.suggest
+    - search.highlight
+    - content.code.annotate
+    - content.code.copy
+    - content.tabs.link
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+      title: On this page
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+
+plugins:
+  - search:
+      lang: en
+  - tags
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/naren-chakraview
+  generator: false
+
+nav:
+  - Home: index.md
+  - Architecture:
+    - architecture/index.md
+    - Diagrams:
+      - Pipeline Flow: architecture/diagrams/pipeline-flow.md
+      - Medallion Layers: architecture/diagrams/medallion-layers.md
+  - Patterns:
+    - patterns/index.md
+  - Contracts:
+    - contracts/index.md
+  - Pipeline:
+    - pipeline/index.md
+  - Serving:
+    - serving/index.md
+  - Observability:
+    - observability/index.md
+  - AI Agents:
+    - ai-agents/index.md
+  - ADRs:
+    - adrs/README.md
+    - ADR-0001 Kappa Architecture: adrs/ADR-0001-kappa-architecture.md
+    - ADR-0002 Medallion Architecture: adrs/ADR-0002-medallion-architecture.md
+    - ADR-0003 Debezium CDC: adrs/ADR-0003-debezium-cdc.md
+    - ADR-0004 Apache Iceberg: adrs/ADR-0004-apache-iceberg.md
+    - ADR-0005 DuckDB Serving Layer: adrs/ADR-0005-duckdb-serving-layer.md
+    - ADR-0006 Avro Schema Registry: adrs/ADR-0006-avro-schema-registry.md
+    - ADR-0007 Flink Stream Processing: adrs/ADR-0007-flink-stream-processing.md
+    - ADR-0008 Data Product Ownership: adrs/ADR-0008-data-product-ownership.md
