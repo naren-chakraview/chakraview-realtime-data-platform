@@ -1,0 +1,128 @@
+# governance/quality/quality_rules.yaml
+#
+# Human-authored quality rules for each pipeline stage.
+# These are the source of truth for what "good data" means.
+#
+# The QualityChecker reads these rules and enforces them in the Flink job.
+# Rule violations are written to governance/quality_results/ in Iceberg.
+#
+# Dimensions (ISO/IEC 25012):
+#   completeness  — required fields are present and non-null
+#   validity      — values conform to business rules (ranges, formats, enums)
+#   consistency   — fields are internally consistent with each other
+#   timeliness    — events arrive within expected windows
+#   uniqueness    — no duplicate key values within expected scope
+
+data_product: orders-analytics
+version: "1.0"
+
+stages:
+  - stage: bronze_ingestion
+    table: bronze.orders
+    checks:
+      - name: event_id_not_null
+        dimension: completeness
+        column: event_id
+        rule: not_null
+        threshold: 1.0         # 100% — event_id is the dedup key; nulls break the pipeline
+
+      - name: occurred_at_not_null
+        dimension: completeness
+        column: occurred_at
+        rule: not_null
+        threshold: 1.0         # 100% — watermarking depends on this field
+
+      - name: occurred_at_not_future
+        dimension: timeliness
+        column: occurred_at
+        rule: not_future
+        tolerance_minutes: 5   # Events > 5 min in the future are clock skew or bugs
+        threshold: 0.999
+
+      - name: occurred_at_not_stale
+        dimension: timeliness
+        column: occurred_at
+        rule: within_days
+        value: 90              # Kappa reprocessing window (kafka_retention_days in data product)
+        threshold: 0.999
+
+  - stage: silver_validation
+    table: silver.orders
+    checks:
+      - name: order_id_not_null
+        dimension: completeness
+        column: order_id
+        rule: not_null
+        threshold: 1.0
+
+      - name: customer_id_not_null
+        dimension: completeness
+        column: customer_id
+        rule: not_null
+        threshold: 0.999       # 99.9% — feeds unique_customers Gold metric
+
+      - name: total_amount_positive
+        dimension: validity
+        column: total_amount_cents
+        rule: greater_than
+        value: 0
+        threshold: 0.999
+
+      - name: total_amount_reasonable
+        dimension: validity
+        column: total_amount_cents
+        rule: less_than
+        value: 100_000_000     # $1M — values above this are almost certainly bugs
+        threshold: 0.9999
+
+      - name: items_total_consistency
+        dimension: consistency
+        rule: column_sum_equals
+        sum_source_column: items_json   # computed: sum(quantity * unit_price_cents)
+        target_column: total_amount_cents
+        threshold: 0.999       # 99.9% — same check ValidateAndDeduplicate runs, here for scoring
+
+      - name: currency_valid_iso4217
+        dimension: validity
+        column: currency
+        rule: in_set
+        values: [USD, EUR, GBP, CAD, AUD, JPY, INR]
+        threshold: 0.999
+
+      - name: item_count_positive
+        dimension: validity
+        column: item_count
+        rule: greater_than
+        value: 0
+        threshold: 1.0
+
+  - stage: gold_aggregation
+    table: gold.order_daily_summary
+    checks:
+      - name: total_revenue_positive
+        dimension: validity
+        column: total_revenue_cents
+        rule: greater_than
+        value: 0
+        threshold: 1.0
+
+      - name: order_count_positive
+        dimension: validity
+        column: order_count
+        rule: greater_than
+        value: 0
+        threshold: 0.99
+
+      - name: unique_customers_lte_order_count
+        dimension: consistency
+        rule: column_a_lte_column_b
+        column_a: unique_customers
+        column_b: order_count
+        threshold: 1.0         # Unique customers can never exceed order count
+
+      - name: updated_at_fresh
+        dimension: timeliness
+        column: updated_at
+        rule: within_minutes
+        value: 10              # 2× the Gold SLA (5 min) — allows one missed run
+        threshold: 0.999

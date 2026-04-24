@@ -104,6 +104,8 @@ nav:
     - observability/index.md
   - AI Agents:
     - ai-agents/index.md
+  - Governance:
+    - governance/index.md
   - ADRs:
     - adrs/README.md
     - ADR-0001 Kappa Architecture: adrs/ADR-0001-kappa-architecture.md
@@ -114,3 +116,4 @@ nav:
     - ADR-0006 Avro Schema Registry: adrs/ADR-0006-avro-schema-registry.md
     - ADR-0007 Flink Stream Processing: adrs/ADR-0007-flink-stream-processing.md
     - ADR-0008 Data Product Ownership: adrs/ADR-0008-data-product-ownership.md
+    - ADR-0009 Data Governance: adrs/ADR-0009-data-governance.md

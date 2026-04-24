@@ -14,3 +14,4 @@ ADRs follow [MADR format](https://adr.github.io/madr/). Every architectural choi
 | [ADR-0006](ADR-0006-avro-schema-registry.md) | Avro with Confluent Schema Registry | Accepted |
 | [ADR-0007](ADR-0007-flink-stream-processing.md) | Apache Flink for Stream Processing | Accepted |
 | [ADR-0008](ADR-0008-data-product-ownership.md) | Data Product Ownership Model | Accepted |
+| [ADR-0009](ADR-0009-data-governance.md) | Data Governance — Quality, Observability, Lineage | Accepted |
