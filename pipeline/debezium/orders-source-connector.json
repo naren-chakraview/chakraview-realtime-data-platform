@@ -1,0 +1,63 @@
+{
+  "name": "orders-postgres-source",
+  "config": {
+    "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
+
+    "database.hostname":    "${file:/opt/kafka/secrets/orders-db.properties:hostname}",
+    "database.port":        "5432",
+    "database.user":        "${file:/opt/kafka/secrets/orders-db.properties:username}",
+    "database.password":    "${file:/opt/kafka/secrets/orders-db.properties:password}",
+    "database.dbname":      "orders",
+    "database.server.name": "chakra-orders",
+
+    "plugin.name":          "pgoutput",
+    "slot.name":            "debezium_orders",
+    "publication.name":     "debezium_orders_pub",
+
+    "table.include.list": "public.orders,public.order_items",
+
+    "heartbeat.interval.ms":    "30000",
+    "heartbeat.topics.prefix":  "_debezium_heartbeat",
+
+    "snapshot.mode":           "initial",
+    "snapshot.isolation.mode": "repeatable_read",
+
+    "key.converter":                          "io.confluent.kafka.serializers.KafkaAvroSerializer",
+    "key.converter.schema.registry.url":      "${env:SCHEMA_REGISTRY_URL}",
+    "value.converter":                        "io.confluent.kafka.serializers.KafkaAvroSerializer",
+    "value.converter.schema.registry.url":    "${env:SCHEMA_REGISTRY_URL}",
+    "value.converter.schemas.enable":         "true",
+
+    "topic.prefix":       "chakra",
+    "topic.creation.enable": "true",
+    "topic.creation.default.replication.factor": "3",
+    "topic.creation.default.partitions":         "12",
+    "topic.creation.default.cleanup.policy":     "delete",
+    "topic.creation.default.retention.ms":       "2592000000",
+
+    "transforms":                       "route,addSourceField",
+
+    "transforms.route.type":            "org.apache.kafka.connect.transforms.ReplaceField$Value",
+    "transforms.route.renames":         "after.order_id:order_id",
+
+    "transforms.addSourceField.type":   "org.apache.kafka.connect.transforms.InsertField$Value",
+    "transforms.addSourceField.static.field": "source_connector",
+    "transforms.addSourceField.static.value": "orders-postgres-source",
+
+    "errors.tolerance":                 "all",
+    "errors.deadletterqueue.topic.name":        "chakra.orders.dlq",
+    "errors.deadletterqueue.topic.replication.factor": "3",
+    "errors.deadletterqueue.context.headers.enable": "true",
+
+    "offset.storage.topic":             "_debezium_offsets",
+    "offset.flush.interval.ms":         "10000",
+
+    "decimal.handling.mode":            "precise",
+    "time.precision.mode":              "adaptive_time_microseconds",
+    "tombstones.on.delete":             "true",
+
+    "max.batch.size":         "2048",
+    "max.queue.size":         "8192",
+    "poll.interval.ms":       "500"
+  }
+}

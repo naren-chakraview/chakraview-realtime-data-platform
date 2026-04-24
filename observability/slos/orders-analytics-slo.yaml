@@ -1,0 +1,78 @@
+data_product: orders-analytics
+slo_version: "1.0"
+window: 30d
+source_contract: contracts/data-products/orders-analytics.yaml
+
+slos:
+  gold_freshness:
+    display_name: "Orders Analytics — Gold Layer Freshness"
+    target: 99.9
+    unit: percent
+    error_budget_minutes: 43.2
+    definition: >
+      Percentage of 1-minute windows in which the Gold order_daily_summary table
+      was updated within the last 5 minutes. Measured as:
+        COUNT(windows where data_age <= 5m) / COUNT(all windows)
+    prometheus_query: |
+      1 - (
+        sum_over_time(
+          (
+            timestamp() - max(
+              orders_gold_last_updated_timestamp_seconds
+            ) > 300
+          )[30d:1m]
+        ) / (30 * 24 * 60)
+      )
+    metric: orders_gold_last_updated_timestamp_seconds
+    alert_tiers:
+      fast_burn:
+        window: 1h
+        burn_rate: 14.4
+        severity: page
+        for: 2m
+      slow_burn:
+        window: 6h
+        burn_rate: 6
+        severity: ticket
+        for: 15m
+
+  pipeline_availability:
+    display_name: "Orders Analytics — Pipeline Availability"
+    target: 99.9
+    unit: percent
+    error_budget_minutes: 43.2
+    definition: >
+      Percentage of time the Flink silver-layer job is actively processing events
+      (consumer lag < 30 seconds). Measured via Kafka consumer lag metric.
+    prometheus_query: |
+      1 - (
+        sum_over_time(
+          (kafka_consumer_lag_seconds{group="flink-silver-orders"} > 30)[30d:1m]
+        ) / (30 * 24 * 60)
+      )
+    alert_tiers:
+      fast_burn:
+        window: 1h
+        burn_rate: 14.4
+        severity: page
+        for: 2m
+      slow_burn:
+        window: 6h
+        burn_rate: 6
+        severity: ticket
+        for: 15m
+
+  dlq_rate:
+    display_name: "Orders Analytics — DLQ Rate"
+    target: orders-analytics.slas.dlq_rate.alert_threshold
+    unit: events_per_hour
+    definition: >
+      Number of OrderPlaced events per hour routed to the dead-letter topic.
+      Not expressed as a burn rate — this is a direct threshold alert.
+    prometheus_query: |
+      increase(orders_dlq_events_total[1h])
+    alert:
+      threshold: 1
+      severity: ticket
+      for: 5m
+      message: "DLQ rate for orders-analytics exceeded 1 event/hour. Check failure_reason label."

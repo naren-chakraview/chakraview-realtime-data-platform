@@ -1,0 +1,73 @@
+{
+  "type": "record",
+  "name": "InventoryUpdated",
+  "namespace": "com.chakraview.inventory.events.v1",
+  "doc": "Emitted by Debezium CDC from the inventory_items table. Carries both before and after state for UPDATE operations. Schema Registry subject: chakra.inventory.updated-value.",
+  "fields": [
+    {
+      "name": "event_id",
+      "type": { "type": "string", "logicalType": "uuid" }
+    },
+    {
+      "name": "operation",
+      "type": {
+        "type": "enum",
+        "name": "CdcOperation",
+        "symbols": ["INSERT", "UPDATE", "DELETE", "READ"],
+        "doc": "READ is emitted during initial snapshot only."
+      }
+    },
+    {
+      "name": "occurred_at",
+      "type": { "type": "long", "logicalType": "timestamp-millis" },
+      "doc": "Timestamp of the database transaction commit (from WAL)."
+    },
+    {
+      "name": "sku",
+      "type": "string",
+      "doc": "Primary key for the inventory item."
+    },
+    {
+      "name": "before",
+      "type": [
+        "null",
+        {
+          "type": "record",
+          "name": "InventoryState",
+          "fields": [
+            { "name": "quantity_on_hand",  "type": "int" },
+            { "name": "quantity_reserved", "type": "int" },
+            { "name": "warehouse_id",      "type": "string" },
+            { "name": "updated_at",        "type": { "type": "long", "logicalType": "timestamp-millis" } }
+          ]
+        }
+      ],
+      "default": null,
+      "doc": "State before the operation. Null for INSERT and READ operations."
+    },
+    {
+      "name": "after",
+      "type": [
+        "null",
+        "InventoryState"
+      ],
+      "default": null,
+      "doc": "State after the operation. Null for DELETE operations."
+    },
+    {
+      "name": "source",
+      "type": {
+        "type": "record",
+        "name": "CdcSource",
+        "fields": [
+          { "name": "db",            "type": "string", "doc": "Database name" },
+          { "name": "schema",        "type": "string", "doc": "Schema / namespace" },
+          { "name": "table",         "type": "string" },
+          { "name": "lsn",           "type": "long",   "doc": "PostgreSQL WAL log sequence number. Used for ordering within a transaction." },
+          { "name": "txn_id",        "type": ["null", "long"], "default": null },
+          { "name": "connector",     "type": "string", "default": "debezium-postgres" }
+        ]
+      }
+    }
+  ]
+}

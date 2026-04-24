@@ -1,0 +1,89 @@
+{
+  "type": "record",
+  "name": "OrderPlaced",
+  "namespace": "com.chakraview.orders.events.v1",
+  "doc": "Emitted by the Orders service when a customer successfully places an order. Source of truth: contracts/schemas/order-placed-v1.avsc. Schema Registry subject: chakra.orders.placed-value.",
+  "fields": [
+    {
+      "name": "event_id",
+      "type": { "type": "string", "logicalType": "uuid" },
+      "doc": "Globally unique event ID. Used for deduplication in the Silver layer."
+    },
+    {
+      "name": "event_type",
+      "type": { "type": "enum", "name": "OrderEventType", "symbols": ["ORDER_PLACED"] },
+      "doc": "Discriminator for the event type within the orders topic."
+    },
+    {
+      "name": "schema_version",
+      "type": "string",
+      "default": "1.0",
+      "doc": "Semantic version of this schema. Incremented on breaking changes only."
+    },
+    {
+      "name": "occurred_at",
+      "type": { "type": "long", "logicalType": "timestamp-millis" },
+      "doc": "Wall-clock time when the order was placed (UTC). Used as Flink event-time watermark source."
+    },
+    {
+      "name": "order_id",
+      "type": { "type": "string", "logicalType": "uuid" },
+      "doc": "Primary key for the order aggregate. Used as the deduplication key in Silver."
+    },
+    {
+      "name": "customer_id",
+      "type": { "type": "string", "logicalType": "uuid" }
+    },
+    {
+      "name": "items",
+      "type": {
+        "type": "array",
+        "items": {
+          "type": "record",
+          "name": "OrderItem",
+          "fields": [
+            { "name": "sku",              "type": "string" },
+            { "name": "quantity",         "type": "int" },
+            { "name": "unit_price_cents", "type": "long" }
+          ]
+        }
+      },
+      "doc": "Line items. Array is non-empty (enforced by INV-ORD-001 in the Orders service)."
+    },
+    {
+      "name": "total_amount_cents",
+      "type": "long",
+      "doc": "Total order value in the smallest currency unit. Must equal sum(items[*].quantity * items[*].unit_price_cents)."
+    },
+    {
+      "name": "currency",
+      "type": "string",
+      "doc": "ISO 4217 currency code (e.g. USD, GBP)."
+    },
+    {
+      "name": "shipping_address",
+      "type": {
+        "type": "record",
+        "name": "ShippingAddress",
+        "fields": [
+          { "name": "line1",        "type": "string" },
+          { "name": "line2",        "type": ["null", "string"], "default": null },
+          { "name": "city",         "type": "string" },
+          { "name": "post_code",    "type": "string" },
+          { "name": "country_code", "type": "string", "doc": "ISO 3166-1 alpha-2" }
+        ]
+      }
+    },
+    {
+      "name": "metadata",
+      "type": {
+        "type": "record",
+        "name": "EventMetadata",
+        "fields": [
+          { "name": "trace_id",   "type": "string", "doc": "W3C TraceContext trace ID for distributed tracing correlation." },
+          { "name": "source_svc", "type": "string", "default": "orders-service" }
+        ]
+      }
+    }
+  ]
+}

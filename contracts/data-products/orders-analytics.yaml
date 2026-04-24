@@ -1,0 +1,102 @@
+data_product: orders-analytics
+version: "1.0"
+owner_team: orders-team
+description: >
+  Analytics data product for the Orders bounded context. Provides daily order
+  summaries, revenue aggregations, and saga health metrics for BI tooling and
+  ML feature engineering. Gold-layer tables are the public interface; Silver
+  tables are internal pipeline concerns.
+
+source:
+  kafka_topic: chakra.orders.placed
+  schema: contracts/schemas/order-placed-v1.avsc
+  kafka_retention_days: 30
+  description: >
+    30 days of Kafka retention supports full Silver reprocessing after a
+    pipeline bug (Kappa reprocessing window — ADR-0001).
+
+slas:
+  ingestion_freshness:
+    max_lag_seconds: 30
+    definition: >
+      Time from source database commit to Bronze Iceberg table write.
+      Measured as: max(event_timestamp) in Bronze minus current time.
+
+  silver_freshness:
+    max_lag_seconds: 120
+    definition: >
+      Time from Bronze write to Silver Iceberg table write.
+      Includes deduplication and schema validation.
+
+  gold_freshness:
+    max_lag_minutes: 5
+    definition: >
+      Time from a source order event to the corresponding row appearing
+      in the Gold order_daily_summary table. This is the consumer-visible SLA.
+    error_budget_minutes: 43.2
+    window: 30d
+
+  availability:
+    value: 99.9
+    unit: percent
+    window: 30d
+    definition: >
+      Percentage of time the Flink pipeline is actively processing events
+      (consumer lag < ingestion_freshness.max_lag_seconds).
+
+  completeness:
+    value: 99.9
+    unit: percent
+    definition: >
+      Percentage of OrderPlaced events in Kafka that appear in the Gold
+      layer within gold_freshness.max_lag_minutes + 2 minutes.
+      Events in the DLQ count as incomplete.
+
+  dlq_rate:
+    max_per_hour: 10
+    alert_threshold: 1
+    definition: >
+      Number of OrderPlaced events per hour that fail Silver validation
+      and are written to the dead-letter topic. A rate above 1 per hour
+      triggers a ticket-priority alert.
+
+gold_tables:
+  - name: order_daily_summary
+    location: s3://chakra-lakehouse/gold/orders-analytics/order_daily_summary/
+    partition_by: [order_date]
+    description: Daily revenue, order count, and item count per currency.
+    schema:
+      - { name: order_date,          type: date,   description: "UTC date of order placement" }
+      - { name: currency,            type: string,  description: "ISO 4217 currency code" }
+      - { name: order_count,         type: long,    description: "Number of distinct orders placed" }
+      - { name: total_revenue_cents, type: long,    description: "Sum of total_amount_cents" }
+      - { name: avg_order_cents,     type: double,  description: "Mean order value" }
+      - { name: p50_order_cents,     type: long,    description: "Median order value (approx)" }
+      - { name: p95_order_cents,     type: long,    description: "p95 order value (approx)" }
+      - { name: item_count,          type: long,    description: "Total line items across all orders" }
+      - { name: unique_customers,    type: long,    description: "Count distinct customer_id" }
+      - { name: updated_at,          type: timestamp_tz, description: "When this partition was last written" }
+
+  - name: order_saga_health
+    location: s3://chakra-lakehouse/gold/orders-analytics/order_saga_health/
+    partition_by: [event_hour]
+    description: Hourly saga compensation rate and latency percentiles.
+    schema:
+      - { name: event_hour,                type: timestamp_tz }
+      - { name: orders_placed,             type: long }
+      - { name: saga_compensations,        type: long }
+      - { name: compensation_rate_pct,     type: double }
+      - { name: saga_p99_duration_ms,      type: long }
+
+dead_letter:
+  topic: chakra.orders.dlq
+  iceberg_table: s3://chakra-lakehouse/bronze/orders-analytics/dlq/
+  retention_days: 90
+  fields:
+    - { name: original_topic,   type: string }
+    - { name: original_offset,  type: long }
+    - { name: failure_reason,   type: string }
+    - { name: failure_stage,    type: string, description: "bronze_validation | silver_dedup | silver_enrichment" }
+    - { name: late_arrival,     type: boolean }
+    - { name: raw_payload,      type: bytes }
+    - { name: arrived_at,       type: timestamp_tz }
