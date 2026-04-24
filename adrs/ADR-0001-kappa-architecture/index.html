@@ -1757,7 +1757,7 @@
 
 
 <h1 id="adr-0001-kappa-architecture-over-lambda">ADR-0001: Kappa Architecture over Lambda<a class="headerlink" href="#adr-0001-kappa-architecture-over-lambda" title="Permanent link">&para;</a></h1>
-<p><strong>Status</strong>: Accepted
+<p><strong>Status</strong>: Accepted (updated 2024-09-12 — Kafka references updated to Redpanda)
 <strong>Date</strong>: 2024-04-01
 <strong>Deciders</strong>: Data platform team</p>
 <hr />
@@ -1766,12 +1766,13 @@
 <p><strong>Lambda Architecture</strong> — Two parallel paths: a real-time streaming path (low latency, approximate) and a batch reprocessing path (high latency, accurate). Results are merged at query time. The batch layer periodically overwrites streaming output with a "correct" version.</p>
 <p><strong>Kappa Architecture</strong> — A single streaming path. The stream is the system of record. Reprocessing is achieved by replaying the Kafka log from the beginning with a new or updated job. There is no separate batch layer.</p>
 <p>Lambda was the dominant pattern circa 2015 when streaming engines were immature and could not produce accurate results at low latency. Apache Flink changed this: it provides exactly-once semantics, event-time processing, and watermarking that make the batch correctness argument obsolete.</p>
+<p>The Kappa reprocessing guarantee depends critically on the message log being <strong>replayable from an arbitrary offset</strong> with <strong>configurable retention</strong>. This requirement informed the message bus choice (ADR-0003): Redpanda provides both, with S3 tiered storage keeping 30 days of topic history without proportionally large broker disk.</p>
 <hr />
 <h2 id="decision">Decision<a class="headerlink" href="#decision" title="Permanent link">&para;</a></h2>
 <p>Adopt <strong>Kappa Architecture</strong>. A single Apache Flink pipeline processes all events from source to Iceberg. There is no batch layer and no merge step.</p>
 <p>Reprocessing is handled by:
-1. Resetting the Debezium connector offset to the beginning of the Kafka topic (for CDC re-reads)
-2. Submitting a new Flink job that reads from the earliest Kafka offset and writes to a new Iceberg table version
+1. Resetting the Debezium connector offset to the beginning of the Redpanda topic (for CDC re-reads)
+2. Submitting a new Flink job that reads from the earliest Redpanda offset and writes to a new Iceberg table version
 3. Swapping the Gold-layer table pointer in the catalog after validation</p>
 <hr />
 <h2 id="consequences">Consequences<a class="headerlink" href="#consequences" title="Permanent link">&para;</a></h2>
@@ -1781,15 +1782,16 @@
 - Iceberg's time travel means historical snapshots are always available without a separate batch store.
 - Operational surface is half of Lambda: one pipeline to monitor, one set of SLAs to define.</p>
 <p><strong>Negative:</strong>
-- Reprocessing requires Kafka log retention sufficient to cover the reprocessing window. This repo uses 30-day retention on all source topics (configured in <code>contracts/data-products/</code>).
-- A Flink job bug that corrupts the Silver or Gold layer requires a full reprocessing run from Kafka. With Lambda, the batch layer would catch this at the next scheduled run.
+- Reprocessing requires Redpanda topic retention sufficient to cover the reprocessing window. This repo uses 30-day retention on all source topics (configured in <code>contracts/data-products/</code>). Redpanda's S3 tiered storage keeps this retention window affordable — older segments are offloaded to object storage while remaining accessible to consumers.
+- A Flink job bug that corrupts the Silver or Gold layer requires a full reprocessing run from Redpanda. With Lambda, the batch layer would catch this at the next scheduled run.
 - Stateful Flink jobs (joins, aggregations) must manage state store size. Lambda's batch path has no state management concern.</p>
 <hr />
 <h2 id="related">Related<a class="headerlink" href="#related" title="Permanent link">&para;</a></h2>
 <ul>
+<li><a href="../ADR-0003-debezium-cdc/">ADR-0003</a> — Redpanda as message bus; why offset replay and tiered storage were required by Kappa</li>
 <li><a href="../ADR-0007-flink-stream-processing/">ADR-0007</a> — Why Flink; exactly-once semantics</li>
 <li><a href="../ADR-0002-medallion-architecture/">ADR-0002</a> — Bronze/Silver/Gold layers within the single stream</li>
-<li><code>contracts/data-products/</code> — Kafka retention requirements per data product</li>
+<li><code>contracts/data-products/</code> — Redpanda topic retention requirements per data product</li>
 </ul>
 
 
