@@ -6,18 +6,15 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Contract-first real-time data platform: Debezium CDC → Kafka → Flink → Apache Iceberg → DuckDB. Kappa architecture, medallion layers, data product ownership.
-">
+        <meta name="description" content="Architecture decision for data quality checks, operational observability, and column-level lineage in the streaming lakehouse.">
       
       
       
-        <link rel="canonical" href="https://naren-chakraview.github.io/chakraview-realtime-data-platform/adrs/ADR-0008-data-product-ownership/">
+        <link rel="canonical" href="https://naren-chakraview.github.io/chakraview-realtime-data-platform/adrs/ADR-0009-data-governance/">
       
       
-        <link rel="prev" href="../ADR-0007-flink-stream-processing/">
+        <link rel="prev" href="../ADR-0008-data-product-ownership/">
       
-      
-        <link rel="next" href="../ADR-0009-data-governance/">
       
       
         
@@ -28,7 +25,7 @@
     
     
       
-        <title>ADR-0008 Data Product Ownership - Chakra Commerce — Real-Time Data Platform</title>
+        <title>ADR-0009 Data Governance — Quality, Observability, Lineage - Chakra Commerce — Real-Time Data Platform</title>
       
     
     
@@ -79,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#adr-0008-data-product-ownership-model" class="md-skip">
+        <a href="#adr-0009-data-governance-quality-observability-and-lineage" class="md-skip">
           Skip to content
         </a>
       
@@ -114,7 +111,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              ADR-0008 Data Product Ownership
+              ADR-0009 Data Governance — Quality, Observability, Lineage
             
           </span>
         </div>
@@ -1482,6 +1479,34 @@
                 
   
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../ADR-0008-data-product-ownership/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-0008 Data Product Ownership
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
     
   
   
@@ -1501,7 +1526,7 @@
   <span class="md-ellipsis">
     
   
-    ADR-0008 Data Product Ownership
+    ADR-0009 Data Governance
   
 
     
@@ -1519,7 +1544,7 @@
   <span class="md-ellipsis">
     
   
-    ADR-0008 Data Product Ownership
+    ADR-0009 Data Governance
   
 
     
@@ -1555,6 +1580,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Context">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-was-considered" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What was considered
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -1570,10 +1612,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#what-a-data-product-owns" class="md-nav__link">
+  <a href="#1-data-quality-governancequality_results" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What a data product owns
+        1. Data Quality — governance/quality_results/
       
     </span>
   </a>
@@ -1581,10 +1623,21 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#what-the-platform-owns" class="md-nav__link">
+  <a href="#2-data-observability-governanceobservability_metrics" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What the platform owns
+        2. Data Observability — governance/observability_metrics/
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-data-lineage-governancelineage_events" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Data Lineage — governance/lineage_events/
       
     </span>
   </a>
@@ -1605,16 +1658,44 @@
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#related" class="md-nav__link">
+    <nav class="md-nav" aria-label="Consequences">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#positive" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Related
+        Positive
       
     </span>
   </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#negative-tradeoffs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Negative / Tradeoffs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#invariants" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Invariants
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1622,34 +1703,6 @@
   
 </nav>
       
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../ADR-0009-data-governance/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    ADR-0009 Data Governance
-  
-
-    
-  </span>
-  
-  
-
-      </a>
     </li>
   
 
@@ -1699,6 +1752,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Context">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-was-considered" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What was considered
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -1714,10 +1784,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#what-a-data-product-owns" class="md-nav__link">
+  <a href="#1-data-quality-governancequality_results" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What a data product owns
+        1. Data Quality — governance/quality_results/
       
     </span>
   </a>
@@ -1725,10 +1795,21 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#what-the-platform-owns" class="md-nav__link">
+  <a href="#2-data-observability-governanceobservability_metrics" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What the platform owns
+        2. Data Observability — governance/observability_metrics/
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-data-lineage-governancelineage_events" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Data Lineage — governance/lineage_events/
       
     </span>
   </a>
@@ -1749,16 +1830,44 @@
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#related" class="md-nav__link">
+    <nav class="md-nav" aria-label="Consequences">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#positive" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Related
+        Positive
       
     </span>
   </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#negative-tradeoffs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Negative / Tradeoffs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#invariants" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Invariants
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1777,53 +1886,158 @@
                 
                   
 
+  <nav class="md-tags" >
+    
+      
+      
+      
+      
+        <span class="md-tag">adrs</span>
+      
+    
+  </nav>
+
 
   
   
 
 
-<h1 id="adr-0008-data-product-ownership-model">ADR-0008: Data Product Ownership Model<a class="headerlink" href="#adr-0008-data-product-ownership-model" title="Permanent link">&para;</a></h1>
-<p><strong>Status</strong>: Accepted
-<strong>Date</strong>: 2024-04-01
-<strong>Deciders</strong>: Data platform team, domain teams</p>
+<h1 id="adr-0009-data-governance-quality-observability-and-lineage">ADR-0009: Data Governance — Quality, Observability, and Lineage<a class="headerlink" href="#adr-0009-data-governance-quality-observability-and-lineage" title="Permanent link">&para;</a></h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Status</strong></td>
+<td>Accepted</td>
+</tr>
+<tr>
+<td><strong>Date</strong></td>
+<td>2024-03-20</td>
+</tr>
+<tr>
+<td><strong>Deciders</strong></td>
+<td>Platform Team, Domain Teams</td>
+</tr>
+<tr>
+<td><strong>Supersedes</strong></td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
 <hr />
 <h2 id="context">Context<a class="headerlink" href="#context" title="Permanent link">&para;</a></h2>
-<p>In a centralized data platform model, the data engineering team owns all pipelines, schemas, and SLAs. Domain teams file tickets when they need new data or schema changes. This creates a bottleneck and separates the people who understand the data (domain teams) from the people who publish it.</p>
-<p>The alternative — a Data Mesh approach — treats data as a product: each domain team owns the data it produces, including the schema, SLA, and quality guarantees.</p>
+<p>The platform has pipeline-level observability (freshness SLOs, DLQ rate alerts) but no systematic answer to three governance questions:</p>
+<ol>
+<li><strong>Quality</strong>: Is the data in each layer <em>correct</em> by business rules — not just present and timely?</li>
+<li><strong>Observability</strong>: Are volumes and distributions behaving <em>as expected</em> compared to historical baselines?</li>
+<li><strong>Lineage</strong>: If a Gold column has bad values, <em>which source field caused it</em>, and what transformations were applied?</li>
+</ol>
+<p>These questions become critical at scale. A freshness SLA can be green while 6% of Silver records silently fail the <code>total_mismatch</code> business rule. Volume can be on-time while carrying an upstream price calculation bug. Without lineage, fixing a Gold column defect requires manually tracing through Flink code, dbt SQL, and the Avro schema.</p>
+<h3 id="what-was-considered">What was considered<a class="headerlink" href="#what-was-considered" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Approach</th>
+<th>Pros</th>
+<th>Cons</th>
+<th>Verdict</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Great Expectations / Soda Core</strong></td>
+<td>Rich rule catalog, HTML reports</td>
+<td>External service, data leaves lakehouse for profiling, separate data contract</td>
+<td>Rejected — adds a third contract format</td>
+</tr>
+<tr>
+<td><strong>Monte Carlo / Acyl (commercial)</strong></td>
+<td>Full suite, auto anomaly detection</td>
+<td>Cost, vendor lock-in, no column-level lineage in open plans</td>
+<td>Rejected</td>
+</tr>
+<tr>
+<td><strong>dbt tests only</strong></td>
+<td>Already in stack, easy to add</td>
+<td>Gold-only (no Bronze/Silver), batch (not streaming), no lineage</td>
+<td>Rejected as sole solution</td>
+</tr>
+<tr>
+<td><strong>Governance Iceberg tables + DuckDB</strong></td>
+<td>Single storage layer, queryable by existing tooling, no new services</td>
+<td>Requires custom quality profiler, lineage emitter</td>
+<td><strong>Accepted</strong></td>
+</tr>
+<tr>
+<td><strong>OpenLineage + Marquez</strong></td>
+<td>Open standard, Flink/dbt native</td>
+<td>Requires running Marquez server</td>
+<td><strong>Accepted as optional layer</strong> on top of Iceberg storage</td>
+</tr>
+</tbody>
+</table>
 <hr />
 <h2 id="decision">Decision<a class="headerlink" href="#decision" title="Permanent link">&para;</a></h2>
-<p>Adopt a <strong>data product ownership model</strong>. Each bounded context (Orders, Inventory, Customers) owns its data product: the Gold-layer Iceberg tables that represent its domain, the Avro schemas for its events, and the freshness/quality SLAs.</p>
-<p>The data platform team owns the <strong>platform</strong> — the Kafka cluster, Debezium connectors, Flink runtime, Iceberg catalog, and DuckDB/Athena query layer. Domain teams own the <strong>contracts</strong> that flow through the platform.</p>
-<h3 id="what-a-data-product-owns">What a data product owns<a class="headerlink" href="#what-a-data-product-owns" title="Permanent link">&para;</a></h3>
-<p>A data product is defined by a <code>contracts/data-products/{name}.yaml</code> file that specifies:
-- <strong>Schema</strong>: Which Avro schema versions are valid inputs
-- <strong>SLAs</strong>: Freshness, completeness, availability, and quality targets
-- <strong>Kafka retention</strong>: How long the source topic must retain messages (drives Kappa reprocessing window)
-- <strong>Gold-layer schema</strong>: The public interface consumers depend on
-- <strong>Owner team</strong>: Who is paged when the data product SLA is breached</p>
-<h3 id="what-the-platform-owns">What the platform owns<a class="headerlink" href="#what-the-platform-owns" title="Permanent link">&para;</a></h3>
+<p>Store all governance data <strong>in the lakehouse as Iceberg tables</strong> at <code>s3://chakra-lakehouse/governance/</code>. Use existing DuckDB to query them. This keeps governance data co-located with the pipeline data it describes, queryable with the same tools analysts already use, and auditable with the same time-travel capabilities as the medallion layers.</p>
+<p>Three governance layers are added:</p>
+<h3 id="1-data-quality-governancequality_results">1. Data Quality — <code>governance/quality_results/</code><a class="headerlink" href="#1-data-quality-governancequality_results" title="Permanent link">&para;</a></h3>
+<p>Quality rules are declared in <code>governance/quality/quality_rules.yaml</code> (human-authored, same discipline as <code>contracts/</code>). The <code>QualityProfiler</code> runs as a 60-second tumbling window side output in the Silver Flink job, evaluating every rule from the YAML against the batch. Results include:</p>
 <ul>
-<li>Debezium connector lifecycle (deploy, monitor, upgrade)</li>
-<li>Flink job runtime (Job Manager, Task Managers, checkpointing)</li>
-<li>Iceberg catalog and compaction schedule</li>
-<li>Schema Registry configuration and compatibility rules</li>
-<li>Observability (SLO definitions derived from <code>contracts/data-products/</code>)</li>
+<li><code>total_record_count</code> / <code>passed_record_count</code> / <code>failed_record_count</code> per check per window</li>
+<li><code>quality_score</code> (0.0–1.0): the fraction of records passing the check</li>
+<li><code>threshold_met</code>: whether the score meets the contract-defined threshold</li>
+<li><code>sample_failure_ids</code>: up to 10 <code>event_id</code> values for DLQ join</li>
 </ul>
+<p>Quality checks are <strong>non-gating</strong> — they do not delay or block the Silver write path. They run in a separate window branch. A failing quality check fires a Prometheus alert but does not stop the pipeline; stopping the pipeline would violate the availability SLA.</p>
+<p>Quality dimensions follow ISO/IEC 25012:
+- <strong>Completeness</strong>: required fields present and non-null
+- <strong>Validity</strong>: values conform to business rules (ranges, enums, cross-field consistency)
+- <strong>Consistency</strong>: related fields agree with each other (item sum = total)
+- <strong>Timeliness</strong>: data arrives within expected windows</p>
+<h3 id="2-data-observability-governanceobservability_metrics">2. Data Observability — <code>governance/observability_metrics/</code><a class="headerlink" href="#2-data-observability-governanceobservability_metrics" title="Permanent link">&para;</a></h3>
+<p>The <code>VolumeMonitor</code> runs every 15 minutes as a standalone job. It reads each medallion layer and computes per-partition metrics:</p>
+<ul>
+<li><code>row_count</code> — total records in the partition</li>
+<li><code>null_rate_{column}</code> — fraction of nulls per column</li>
+<li><code>mean_{column}</code>, <code>stddev_{column}</code>, <code>p95_{column}</code> — distribution stats for numeric columns</li>
+<li><code>distinct_count_{column}</code> — approximate cardinality (HyperLogLog)</li>
+</ul>
+<p>Anomaly detection uses Z-score against a 7-day rolling baseline:
+- <code>|z_score| &gt; 3.0</code> → <code>anomaly_detected = TRUE</code> → Prometheus alert fires
+- <code>2.0 &lt; |z_score| ≤ 3.0</code> → Grafana amber warning, no page</p>
+<p>The <code>SchemaDriftDetector</code> runs hourly. It compares the current Iceberg schema fingerprint to the last known fingerprint and emits structured drift events to <code>governance/schema_drift_events/</code>. Drift types follow Iceberg v2 safety rules: <code>COLUMN_ADDED</code> and <code>RENAME</code> are safe; <code>TYPE_CHANGED</code> is potentially unsafe (only widening promotions are safe in Iceberg v2); <code>COLUMN_DROPPED</code> is safe for Iceberg files but breaks downstream SQL.</p>
+<h3 id="3-data-lineage-governancelineage_events">3. Data Lineage — <code>governance/lineage_events/</code><a class="headerlink" href="#3-data-lineage-governancelineage_events" title="Permanent link">&para;</a></h3>
+<p>The <code>OpenLineageEmitter</code> is integrated into the Flink Silver job and (via <code>dbt-openlineage</code>) into dbt Gold model runs. It emits <code>OpenLineageDatasetFacet</code> events at <code>START</code> and <code>COMPLETE</code> with column-level lineage via <code>ColumnLineageDatasetFacet</code>.</p>
+<p>Column-level lineage maps are declared in <code>governance/lineage/openlineage_emitter.py</code>:
+- <code>KAFKA_TO_SILVER_LINEAGE</code>: maps each Kafka Avro field to its Silver column with the transformation type (<code>direct_copy</code>, <code>expression:len(items)</code>, etc.)
+- <code>SILVER_TO_GOLD_LINEAGE</code>: maps Silver columns to Gold columns with aggregation types (<code>aggregate_sum</code>, <code>aggregate_count_distinct</code>, etc.)</p>
+<p>Events are stored in Iceberg (queryable by DuckDB) <strong>and optionally forwarded to a Marquez backend</strong> (via <code>MARQUEZ_URL</code> env var) for visual graph rendering. The Iceberg storage is the source of truth; Marquez is a read view.</p>
 <hr />
 <h2 id="consequences">Consequences<a class="headerlink" href="#consequences" title="Permanent link">&para;</a></h2>
-<p><strong>Positive:</strong>
-- Domain teams can evolve their schemas and SLAs without filing platform tickets.
-- SLA breaches page the domain team that owns the data, not the platform team.
-- The <code>contracts/data-products/</code> directory is auditable: every change to a data product SLA goes through PR review by the owning team (<code>CODEOWNERS</code>).</p>
-<p><strong>Negative:</strong>
-- Domain teams must understand enough about Avro and Iceberg to author valid contracts. This requires investment in documentation and onboarding.
-- Conflicting SLAs across data products (e.g., Orders wants 1-minute freshness, platform can deliver 2-minute) must be resolved at contract authoring time, not at incident time.</p>
-<hr />
-<h2 id="related">Related<a class="headerlink" href="#related" title="Permanent link">&para;</a></h2>
+<h3 id="positive">Positive<a class="headerlink" href="#positive" title="Permanent link">&para;</a></h3>
 <ul>
-<li><code>contracts/data-products/</code> — All data product definitions</li>
-<li><code>CODEOWNERS</code> — Domain team ownership of their data product contract files</li>
-<li><a href="../ADR-0006-avro-schema-registry/">ADR-0006</a> — Schema governance that supports domain ownership</li>
+<li><strong>Single storage layer</strong>: governance data is in the same Iceberg/S3 store as pipeline data — same backup, same retention, same access controls</li>
+<li><strong>DuckDB queryable</strong>: the quality waterfall, volume anomaly, and lineage graph queries all run in DuckDB with <code>iceberg_scan()</code> — no new query engine</li>
+<li><strong>Non-gating quality</strong>: quality checks add observability without adding latency or availability risk to the Silver write path</li>
+<li><strong>OpenLineage standard</strong>: if the team later adopts DataHub or Apache Atlas, lineage events can be replayed from Iceberg into those systems</li>
+</ul>
+<h3 id="negative-tradeoffs">Negative / Tradeoffs<a class="headerlink" href="#negative-tradeoffs" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>No UI out of the box</strong>: Marquez provides a graph UI, but only if deployed. Without it, lineage is SQL-only (which is sufficient for the reference implementation, but less discoverable)</li>
+<li><strong>Quality rules are code-co-located</strong>: <code>quality_rules.yaml</code> is in the platform repo, not in each domain team's repo. A domain team must open a PR to add quality rules. This is intentional (platform team reviews the threshold) but adds friction</li>
+<li><strong>Z-score baseline needs warmup</strong>: the first 7 days of data produce no anomaly signals. The baseline is empty; the monitor logs but does not alert</li>
+</ul>
+<h3 id="invariants">Invariants<a class="headerlink" href="#invariants" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Quality checks must never gate the Silver write path</li>
+<li>Every quality rule must have a <code>threshold</code> field — no threshold means the rule is never evaluated for SLO compliance</li>
+<li>Column lineage maps must be updated whenever <code>_to_silver()</code> or a dbt model changes a column mapping</li>
+<li><code>governance/</code> tables follow the same 90-day snapshot retention as Bronze (they are audit data)</li>
 </ul>
 
 
@@ -1831,6 +2045,9 @@
 
 
 
+
+  
+  
 
 
 

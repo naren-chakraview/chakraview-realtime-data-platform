@@ -6,17 +6,17 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="The human-authored source of truth — Avro schemas, data product SLAs, and pipeline lineage that govern everything downstream.">
+        <meta name="description" content="Quality checks, volume observability, and column-level lineage — all stored as Iceberg tables and queryable by DuckDB.">
       
       
       
-        <link rel="canonical" href="https://naren-chakraview.github.io/chakraview-realtime-data-platform/contracts/">
+        <link rel="canonical" href="https://naren-chakraview.github.io/chakraview-realtime-data-platform/governance/">
       
       
-        <link rel="prev" href="../patterns/">
+        <link rel="prev" href="../ai-agents/">
       
       
-        <link rel="next" href="../pipeline/">
+        <link rel="next" href="../adrs/">
       
       
         
@@ -27,7 +27,7 @@
     
     
       
-        <title>Contracts - Chakra Commerce — Real-Time Data Platform</title>
+        <title>Data Governance - Chakra Commerce — Real-Time Data Platform</title>
       
     
     
@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#contracts" class="md-skip">
+        <a href="#data-governance" class="md-skip">
           Skip to content
         </a>
       
@@ -113,7 +113,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Contracts
+              Data Governance
             
           </span>
         </div>
@@ -281,13 +281,11 @@
   
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
-        <a href="./" class="md-tabs__link">
+      <li class="md-tabs__item">
+        <a href="../contracts/" class="md-tabs__link">
           
   
   
@@ -393,11 +391,13 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="../governance/" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="./" class="md-tabs__link">
           
   
   
@@ -781,8 +781,6 @@
       
   
   
-    
-  
   
   
     
@@ -796,23 +794,20 @@
     
     
       
-        
-        
-      
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
         
           
           <div class="md-nav__link md-nav__container">
-            <a href="./" class="md-nav__link md-nav__link--active">
+            <a href="../contracts/" class="md-nav__link ">
               
   
   
@@ -831,7 +826,7 @@
             
           </div>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_4">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1131,6 +1126,8 @@
       
   
   
+    
+  
   
   
     
@@ -1144,20 +1141,23 @@
     
     
       
+        
+        
+      
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" checked>
         
           
           <div class="md-nav__link md-nav__container">
-            <a href="../governance/" class="md-nav__link ">
+            <a href="./" class="md-nav__link md-nav__link--active">
               
   
   
@@ -1176,7 +1176,7 @@
             
           </div>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_9">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1569,43 +1569,127 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#avro-schemas" class="md-nav__link">
+  <a href="#data-quality" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Avro Schemas
+        Data Quality
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Data Quality">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-quality-waterfall" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Quality Waterfall
       
     </span>
   </a>
   
 </li>
+        
+      </ul>
+    </nav>
+  
+</li>
       
         <li class="md-nav__item">
-  <a href="#data-product-contracts" class="md-nav__link">
+  <a href="#data-observability" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Data Product Contracts
+        Data Observability
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Data Observability">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#volume-anomaly-detection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Volume Anomaly Detection
       
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#how-contracts-flow-downstream" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#schema-drift-detection" class="md-nav__link">
     <span class="md-ellipsis">
       
-        How Contracts Flow Downstream
+        Schema Drift Detection
       
     </span>
   </a>
   
 </li>
+        
+      </ul>
+    </nav>
+  
+</li>
       
         <li class="md-nav__item">
-  <a href="#validation" class="md-nav__link">
+  <a href="#data-lineage" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Validation
+        Data Lineage
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Data Lineage">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#column-lineage-map" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Column Lineage Map
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#forward-impact-analysis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Forward Impact Analysis
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#backward-trace" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Backward Trace
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#governance-data-locations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Governance Data Locations
       
     </span>
   </a>
@@ -1633,7 +1717,7 @@
       
       
       
-        <span class="md-tag">contracts</span>
+        <span class="md-tag">governance</span>
       
     
   </nav>
@@ -1643,136 +1727,247 @@
   
 
 
-<h1 id="contracts">Contracts<a class="headerlink" href="#contracts" title="Permanent link">&para;</a></h1>
-<p><code>contracts/</code> is the only directory domain teams author directly. Every downstream artifact — Debezium connector configs, Flink job schemas, Iceberg table DDL, SLO YAML files, Kafka retention settings — is derived from or generated by these files.</p>
+<h1 id="data-governance">Data Governance<a class="headerlink" href="#data-governance" title="Permanent link">&para;</a></h1>
+<p>Three governance layers sit alongside the medallion pipeline. Each stores results in <code>s3://chakra-lakehouse/governance/</code> as Iceberg tables — queryable by the same DuckDB connection used for analyst queries, with the same time-travel capabilities.</p>
+<pre class="mermaid"><code>flowchart TD
+    subgraph Pipeline["Pipeline (existing)"]
+        BRONZE["Bronze"]
+        SILVER["Silver"]
+        GOLD["Gold"]
+        DLQ["DLQ"]
+        BRONZE --&gt; SILVER --&gt; GOLD
+    end
+
+    subgraph Governance["Governance (new)"]
+        QR["quality_results\nper-check scores · 60s windows"]
+        OM["observability_metrics\nvolume · distribution · Z-score"]
+        LE["lineage_events\nOpenLineage · column-level"]
+        SD["schema_drift_events\nfingerprint diffs"]
+    end
+
+    subgraph Dashboards["DuckDB Visualization"]
+        QD["Quality Waterfall\nwhere quality degrades"]
+        VD["Volume Anomaly\nwhat changed in volume/distribution"]
+        LD["Lineage Graph\nwhy Gold column has bad values"]
+    end
+
+    SILVER --&gt;|"QualityProfiler\n60s side output"| QR
+    SILVER --&gt;|"OpenLineageEmitter\nSTART/COMPLETE"| LE
+    BRONZE &amp; SILVER &amp; GOLD --&gt;|"VolumeMonitor\nevery 15 min"| OM
+    BRONZE &amp; SILVER &amp; GOLD --&gt;|"SchemaDriftDetector\nhourly"| SD
+
+    QR --&gt; QD
+    OM &amp; SD --&gt; VD
+    LE --&gt; LD
+
+    style BRONZE fill:#92400e,color:#fff
+    style SILVER fill:#1e3a5f,color:#fff
+    style GOLD fill:#14532d,color:#fff
+    style DLQ fill:#7f1d1d,color:#fff
+    style QR fill:#1e3a5f,color:#fff
+    style OM fill:#0f766e,color:#fff
+    style LE fill:#374151,color:#fff
+    style SD fill:#374151,color:#fff</code></pre>
+<p><a href="../adrs/ADR-0009-data-governance/"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.22 19.03a.75.75 0 0 1 0-1.06L18.19 13H3.75a.75.75 0 0 1 0-1.5h14.44l-4.97-4.97a.749.749 0 0 1 .326-1.275.75.75 0 0 1 .734.215l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0"/></svg></span> ADR-0009: Data Governance decisions</a></p>
 <hr />
-<h2 id="avro-schemas">Avro Schemas<a class="headerlink" href="#avro-schemas" title="Permanent link">&para;</a></h2>
-<p>Every Kafka topic has a schema in <code>contracts/schemas/</code>. These are the wire format contracts: producers and consumers are bound to them. Schema evolution follows <code>BACKWARD_TRANSITIVE</code> compatibility (ADR-0006).</p>
-<p>Schemas use Avro <a href="https://avro.apache.org/docs/current/spec.html#Logical+Types">logical types</a> throughout — <code>uuid</code> for identifiers, <code>timestamp-millis</code> for all timestamps. This makes field intent unambiguous and ensures correct deserialization in Flink and Iceberg without ad-hoc parsing.</p>
-<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">order-placed-v1.avsc</label><label for="__tabbed_1_2">inventory-updated-v1.avsc</label></div>
-<div class="tabbed-content">
-<div class="tabbed-block">
-<p><div class="language-json highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="p">{</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;record&quot;</span><span class="p">,</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;OrderPlaced&quot;</span><span class="p">,</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">  </span><span class="nt">&quot;namespace&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;com.chakraview.orders.events.v1&quot;</span><span class="p">,</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">  </span><span class="nt">&quot;fields&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;event_id&quot;</span><span class="p">,</span><span class="w">    </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;logicalType&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;uuid&quot;</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">},</span>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;occurred_at&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;long&quot;</span><span class="p">,</span><span class="w">   </span><span class="nt">&quot;logicalType&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;timestamp-millis&quot;</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">},</span>
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;order_id&quot;</span><span class="p">,</span><span class="w">    </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;logicalType&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;uuid&quot;</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">},</span>
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">    </span><span class="err">...</span>
-</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;metadata&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;record&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;EventMetadata&quot;</span><span class="p">,</span>
-</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="w">        </span><span class="nt">&quot;fields&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span><span class="w"> </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;trace_id&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="w"> </span><span class="p">}]</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">}</span>
-</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="w">  </span><span class="p">]</span>
-</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="p">}</span>
+<h2 id="data-quality">Data Quality<a class="headerlink" href="#data-quality" title="Permanent link">&para;</a></h2>
+<p><strong>Where</strong>: <code>governance/quality/quality_rules.yaml</code> (rules) · <code>governance/quality/quality_checker.py</code> (Flink profiler)</p>
+<p><strong>What it captures</strong>: Quality scores per business rule per 60-second window, for each pipeline stage from Bronze ingestion through Gold aggregation.</p>
+<p>Quality rules are human-authored YAML, matching the same discipline as <code>contracts/</code>:</p>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># governance/quality/quality_rules.yaml</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">stage</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">silver_validation</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="nt">table</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">silver.orders</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">  </span><span class="nt">checks</span><span class="p">:</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">items_total_consistency</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">      </span><span class="nt">dimension</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">consistency</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">      </span><span class="nt">rule</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">column_sum_equals</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">      </span><span class="nt">threshold</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.999</span><span class="w">    </span><span class="c1"># 99.9% of orders must have matching totals</span>
 </span></code></pre></div>
-<a href="https://github.com/naren-chakraview/chakraview-realtime-data-platform/blob/main/contracts/schemas/order-placed-v1.avsc">Full schema →</a></p>
-</div>
-<div class="tabbed-block">
-<p>CDC envelope schema — includes <code>operation</code> enum (INSERT/UPDATE/DELETE/READ), <code>before</code>/<code>after</code> union types, and <code>source.lsn</code> for WAL sequence ordering.</p>
-<p><div class="language-json highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="p">{</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;operation&quot;</span><span class="p">,</span>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">  </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;enum&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;CdcOperation&quot;</span><span class="p">,</span>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">            </span><span class="nt">&quot;symbols&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;INSERT&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;UPDATE&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;DELETE&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;READ&quot;</span><span class="p">]</span><span class="w"> </span><span class="p">}</span>
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="p">}</span>
+<p>The <code>QualityProfiler</code> runs as a 60-second tumbling window side output — a separate branch from the Silver write path. Quality checks never delay or block data delivery.</p>
+<h3 id="the-quality-waterfall">The Quality Waterfall<a class="headerlink" href="#the-quality-waterfall" title="Permanent link">&para;</a></h3>
+<p>The primary instability visualization. Shows quality scores at each pipeline stage in order:</p>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1">-- governance/dashboards/quality_overview.sql — Query 1</span>
 </span></code></pre></div>
-<a href="https://github.com/naren-chakraview/chakraview-realtime-data-platform/blob/main/contracts/schemas/inventory-updated-v1.avsc">Full schema →</a></p>
-</div>
-</div>
-</div>
+<p>Example output showing a Silver-stage problem:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>Stage                  Records   Quality     Status
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>──────────────────     ───────   ───────     ──────
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>1. Bronze Ingestion    100,000   100.00%     ✓
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>2. Silver Validation    94,000    94.00%     ✗  ← instability identified here
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>3. Silver Dedup         93,900    93.90%     ✗
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>4. Gold Aggregation     93,900    93.90%     ✗
+</span></code></pre></div>
+<p>The drop between Bronze (100%) and Silver (94%) immediately identifies that 6% of records are failing Silver business rule validation. The waterfall collapses a complex multi-stage pipeline into a single, interpretable view.</p>
+<p><strong>DLQ correlation</strong>: <code>sample_failure_ids</code> in each quality result stores up to 10 <code>event_id</code> values. Join these against the DLQ Iceberg table to get the full failure context including the original Avro bytes.</p>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1">-- Join quality failures to DLQ records for full context</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="k">SELECT</span><span class="w"> </span><span class="n">q</span><span class="p">.</span><span class="n">check_name</span><span class="p">,</span><span class="w"> </span><span class="n">q</span><span class="p">.</span><span class="n">failed_record_count</span><span class="p">,</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">failure_reason</span><span class="p">,</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">raw_payload</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="k">FROM</span><span class="w"> </span><span class="n">iceberg_scan</span><span class="p">(</span><span class="s1">&#39;s3://chakra-lakehouse/governance/quality_results/&#39;</span><span class="p">)</span><span class="w"> </span><span class="n">q</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="k">JOIN</span><span class="w"> </span><span class="n">iceberg_scan</span><span class="p">(</span><span class="s1">&#39;s3://chakra-lakehouse/bronze/orders-analytics/dlq/&#39;</span><span class="p">)</span><span class="w"> </span><span class="n">d</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">  </span><span class="k">ON</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">original_offset</span><span class="w"> </span><span class="k">IN</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">     </span><span class="k">SELECT</span><span class="w"> </span><span class="k">UNNEST</span><span class="p">(</span><span class="n">FROM_JSON</span><span class="p">(</span><span class="n">q</span><span class="p">.</span><span class="n">sample_failure_ids</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;[&quot;VARCHAR&quot;]&#39;</span><span class="p">))</span>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="w">  </span><span class="p">)</span>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="k">WHERE</span><span class="w"> </span><span class="n">q</span><span class="p">.</span><span class="n">evaluated_at</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="n">NOW</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nb">INTERVAL</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="n">HOUR</span><span class="p">;</span>
+</span></code></pre></div>
 <hr />
-<h2 id="data-product-contracts">Data Product Contracts<a class="headerlink" href="#data-product-contracts" title="Permanent link">&para;</a></h2>
-<p>Each data product is defined by a YAML file in <code>contracts/data-products/</code>. This file is the boundary between a domain team's responsibility and the platform team's responsibility.</p>
-<p>A data product contract specifies:</p>
+<h2 id="data-observability">Data Observability<a class="headerlink" href="#data-observability" title="Permanent link">&para;</a></h2>
+<p><strong>Where</strong>: <code>governance/observability/volume_monitor.py</code> · <code>governance/observability/schema_drift_detector.py</code></p>
+<p><strong>What it captures</strong>: Row counts, null rates, and distribution statistics per table per partition — with Z-score anomaly detection against a 7-day baseline.</p>
+<h3 id="volume-anomaly-detection">Volume Anomaly Detection<a class="headerlink" href="#volume-anomaly-detection" title="Permanent link">&para;</a></h3>
+<p>The <code>VolumeMonitor</code> runs every 15 minutes and computes:</p>
 <table>
 <thead>
 <tr>
-<th>Section</th>
-<th>What it defines</th>
-<th>Who uses it</th>
+<th>Metric</th>
+<th>What it catches</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>slas.ingestion_freshness</code></td>
-<td>Max lag Bronze ≤ 30s</td>
-<td>Alert generation script</td>
+<td><code>row_count</code></td>
+<td>Connector failure (drops to 0), duplicate ingestion (doubles)</td>
 </tr>
 <tr>
-<td><code>slas.gold_freshness</code></td>
-<td>Max lag Gold ≤ 5 min</td>
-<td>SLO YAML, Prometheus alert</td>
+<td><code>null_rate_{column}</code></td>
+<td>Producer bug that starts sending null for a required field</td>
 </tr>
 <tr>
-<td><code>slas.dlq_rate</code></td>
-<td>Max DLQ events/hour</td>
-<td>Alert threshold</td>
+<td><code>mean_{column}</code></td>
+<td>Business data drift (e.g., average order size climbing unexpectedly)</td>
 </tr>
 <tr>
-<td><code>kafka_retention_days</code></td>
-<td>Kappa reprocessing window</td>
-<td>MSK topic config</td>
+<td><code>stddev_{column}</code></td>
+<td>Distribution widening (e.g., pricing bug causing outliers)</td>
 </tr>
 <tr>
-<td><code>gold_tables[].schema</code></td>
-<td>Public Gold layer interface</td>
-<td>Iceberg DDL generation</td>
-</tr>
-<tr>
-<td><code>dead_letter.fields</code></td>
-<td>DLQ record schema</td>
-<td>Flink DLQ sink, audit queries</td>
-</tr>
-<tr>
-<td><code>owner_team</code></td>
-<td>Who is paged on SLA breach</td>
-<td>PagerDuty routing</td>
+<td><code>distinct_count_{column}</code></td>
+<td>Cardinality collapse (e.g., customer_id starts repeating)</td>
 </tr>
 </tbody>
 </table>
-<div class="admonition example">
-<p class="admonition-title">orders-analytics.yaml highlights</p>
-<p><div class="language-yaml highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nt">slas</span><span class="p">:</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span><span class="nt">gold_freshness</span><span class="p">:</span>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">    </span><span class="nt">max_lag_minutes</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">5</span>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">    </span><span class="nt">error_budget_minutes</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">43.2</span>
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">    </span><span class="nt">window</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">30d</span>
-</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>
-</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="nt">gold_tables</span><span class="p">:</span>
-</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">order_daily_summary</span>
-</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="w">    </span><span class="nt">schema</span><span class="p">:</span>
-</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt"> name</span><span class="p">:</span><span class="w"> </span><span class="nv">order_date</span><span class="p p-Indicator">,</span><span class="nt">          type</span><span class="p">:</span><span class="w"> </span><span class="nv">date</span><span class="w"> </span><span class="p p-Indicator">}</span>
-</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt"> name</span><span class="p">:</span><span class="w"> </span><span class="nv">total_revenue_cents</span><span class="p p-Indicator">,</span><span class="nt"> type</span><span class="p">:</span><span class="w"> </span><span class="nv">long</span><span class="w"> </span><span class="p p-Indicator">}</span>
-</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt"> name</span><span class="p">:</span><span class="w"> </span><span class="nv">unique_customers</span><span class="p p-Indicator">,</span><span class="nt">    type</span><span class="p">:</span><span class="w"> </span><span class="nv">long</span><span class="w"> </span><span class="p p-Indicator">}</span>
-</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt"> name</span><span class="p">:</span><span class="w"> </span><span class="nv">updated_at</span><span class="p p-Indicator">,</span><span class="nt">          type</span><span class="p">:</span><span class="w"> </span><span class="nv">timestamp_tz</span><span class="w"> </span><span class="p p-Indicator">}</span>
+<p>Anomaly threshold: <code>|Z-score| &gt; 3.0</code> (standard deviations from 7-day rolling mean). This threshold catches operational failures while tolerating normal business variation (seasonal peaks are typically ≤ 2σ).</p>
+<p><strong>Bronze–Silver divergence query</strong>:</p>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1">-- A widening gap between Bronze and Silver row counts means more records</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="c1">-- are being rejected by Silver validation — quality is degrading</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="k">SELECT</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">    </span><span class="n">partition_date</span><span class="p">,</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">    </span><span class="n">bronze_rows</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">silver_rows</span><span class="w">  </span><span class="k">AS</span><span class="w"> </span><span class="n">rejected_in_silver</span><span class="p">,</span>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">    </span><span class="n">ROUND</span><span class="p">((</span><span class="n">bronze_rows</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">silver_rows</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">100</span><span class="p">.</span><span class="mi">0</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">bronze_rows</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="ss">&quot;rejection_%&quot;</span>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="k">FROM</span><span class="w"> </span><span class="p">(</span><span class="n">query</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">observability_overview</span><span class="p">.</span><span class="k">sql</span><span class="p">)</span>
 </span></code></pre></div>
-<a href="https://github.com/naren-chakraview/chakraview-realtime-data-platform/blob/main/contracts/data-products/orders-analytics.yaml">Full contract →</a></p>
-</div>
+<h3 id="schema-drift-detection">Schema Drift Detection<a class="headerlink" href="#schema-drift-detection" title="Permanent link">&para;</a></h3>
+<p>The <code>SchemaDriftDetector</code> compares Iceberg schema fingerprints hourly. Drift types and their safety implications:</p>
+<table>
+<thead>
+<tr>
+<th>Drift Type</th>
+<th>Iceberg Safety</th>
+<th>Query Impact</th>
+<th>Alert Severity</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>COLUMN_ADDED</code></td>
+<td>Safe — field ID preserved</td>
+<td>New column visible immediately</td>
+<td>Info</td>
+</tr>
+<tr>
+<td><code>RENAME</code></td>
+<td>Safe — field ID unchanged</td>
+<td>Old name alias needed in queries</td>
+<td>Info</td>
+</tr>
+<tr>
+<td><code>COLUMN_DROPPED</code></td>
+<td>Safe for files</td>
+<td>Existing SQL breaks</td>
+<td>Warning</td>
+</tr>
+<tr>
+<td><code>TYPE_CHANGED</code> (widening)</td>
+<td>Safe (int→long, float→double)</td>
+<td>No impact</td>
+<td>Info</td>
+</tr>
+<tr>
+<td><code>TYPE_CHANGED</code> (other)</td>
+<td>Unsafe — breaks reads</td>
+<td>Deserialization failure</td>
+<td>Error</td>
+</tr>
+</tbody>
+</table>
 <hr />
-<h2 id="how-contracts-flow-downstream">How Contracts Flow Downstream<a class="headerlink" href="#how-contracts-flow-downstream" title="Permanent link">&para;</a></h2>
-<pre class="mermaid"><code>flowchart TD
-    S["contracts/schemas/*.avsc"]
-    DP["contracts/data-products/*.yaml"]
-
-    S --&gt;|"Debezium value.converter"| DC["pipeline/debezium/*.json\nconnector config"]
-    S --&gt;|"Flink deserialization"| FJ["pipeline/flink/*.py\nAvroRowDeserializationSchema"]
-    S --&gt;|"Silver table schema"| ICE["Iceberg Silver table DDL\n(agent-generated)"]
-
-    DP --&gt;|"gold_tables schema"| GOLD["Iceberg Gold table DDL\n(agent-generated)"]
-    DP --&gt;|"slas.gold_freshness"| SLO["observability/slos/*.yaml"]
-    DP --&gt;|"kafka_retention_days"| MSK["MSK topic retention\nTerraform variable"]
-    DP --&gt;|"slas.dlq_rate"| ALERT["observability/alerts/*.yaml"]
-    DP --&gt;|"owner_team"| PD["PagerDuty routing"]</code></pre>
+<h2 id="data-lineage">Data Lineage<a class="headerlink" href="#data-lineage" title="Permanent link">&para;</a></h2>
+<p><strong>Where</strong>: <code>governance/lineage/openlineage_emitter.py</code></p>
+<p><strong>What it captures</strong>: Column-level lineage for every pipeline run, stored in OpenLineage format and queryable as an Iceberg table.</p>
+<h3 id="column-lineage-map">Column Lineage Map<a class="headerlink" href="#column-lineage-map" title="Permanent link">&para;</a></h3>
+<p>The lineage map is explicit — declared in the emitter, not inferred:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>kafka://chakra.orders.placed.total_amount_cents  ──direct_copy──►  silver.orders.total_amount_cents
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>                                                                           │
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>                                                                    aggregate_sum
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>                                                                           │
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>                                                                           ▼
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>                                                              gold.order_daily_summary.total_revenue_cents
+</span></code></pre></div>
+<h3 id="forward-impact-analysis">Forward Impact Analysis<a class="headerlink" href="#forward-impact-analysis" title="Permanent link">&para;</a></h3>
+<p>"If I rename <code>total_amount_cents</code> in the Avro schema, which Gold columns are affected?"</p>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1">-- governance/dashboards/lineage_graph.sql — Query 2 (Forward Impact)</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="k">SELECT</span><span class="w"> </span><span class="n">source_field</span><span class="p">,</span><span class="w"> </span><span class="n">output_column</span><span class="p">,</span><span class="w"> </span><span class="n">transform_type</span><span class="p">,</span><span class="w"> </span><span class="n">produced_by</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="k">FROM</span><span class="w"> </span><span class="p">(</span><span class="n">lineage</span><span class="w"> </span><span class="n">edge</span><span class="w"> </span><span class="n">query</span><span class="p">)</span>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="k">WHERE</span><span class="w"> </span><span class="n">source_field</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;total_amount_cents&#39;</span><span class="p">;</span>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="c1">-- Result:</span>
+</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="c1">-- total_amount_cents → silver.orders.total_amount_cents      (direct_copy,  silver-layer-orders)</span>
+</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="c1">-- total_amount_cents → gold.order_daily_summary.total_revenue_cents (aggregate_sum, dbt:order_daily_summary)</span>
+</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="c1">-- total_amount_cents → gold.order_daily_summary.avg_order_cents     (aggregate_avg, dbt:order_daily_summary)</span>
+</span></code></pre></div>
+<h3 id="backward-trace">Backward Trace<a class="headerlink" href="#backward-trace" title="Permanent link">&para;</a></h3>
+<p>"Gold <code>total_revenue_cents</code> is wrong this week — what's the root cause?"</p>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1">-- Query 3 (Backward Trace)</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="k">SELECT</span><span class="w"> </span><span class="n">source_dataset</span><span class="p">,</span><span class="w"> </span><span class="n">source_field</span><span class="p">,</span><span class="w"> </span><span class="n">transform_type</span><span class="p">,</span><span class="w"> </span><span class="n">transformation_step</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="k">FROM</span><span class="w"> </span><span class="p">(</span><span class="n">lineage</span><span class="w"> </span><span class="n">edge</span><span class="w"> </span><span class="n">query</span><span class="p">)</span>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="k">WHERE</span><span class="w"> </span><span class="n">output_column</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;total_revenue_cents&#39;</span><span class="p">;</span>
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="c1">-- Result:</span>
+</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="c1">-- kafka://chakra.orders.placed → total_amount_cents  (direct_copy → aggregate_sum)</span>
+</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="c1">-- system → dbt_run_timestamp  (updated_at only)</span>
+</span></code></pre></div>
+<p>The trace tells you to check <code>total_amount_cents</code> in the Avro source events — likely a producer-side bug.</p>
 <hr />
-<h2 id="validation">Validation<a class="headerlink" href="#validation" title="Permanent link">&para;</a></h2>
-<p><code>tooling/validate-data-contracts.sh</code> (generated by Script Authoring Agent) checks:</p>
-<ol>
-<li>Every <code>contracts/schemas/*.avsc</code> is valid Avro JSON</li>
-<li>Every <code>contracts/data-products/*.yaml</code> references a schema that exists in <code>contracts/schemas/</code></li>
-<li>Every data product has a matching <code>observability/slos/*.yaml</code></li>
-<li>Every Gold table name in a data product has a matching dbt model in <code>pipeline/dbt/models/gold/</code></li>
-</ol>
-<p>Run locally: <code>bash tooling/validate-data-contracts.sh</code></p>
+<h2 id="governance-data-locations">Governance Data Locations<a class="headerlink" href="#governance-data-locations" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Table</th>
+<th>Path</th>
+<th>Retention</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>quality_results</code></td>
+<td><code>s3://chakra-lakehouse/governance/quality_results/</code></td>
+<td>90 days</td>
+</tr>
+<tr>
+<td><code>observability_metrics</code></td>
+<td><code>s3://chakra-lakehouse/governance/observability_metrics/</code></td>
+<td>90 days</td>
+</tr>
+<tr>
+<td><code>lineage_events</code></td>
+<td><code>s3://chakra-lakehouse/governance/lineage_events/</code></td>
+<td>90 days</td>
+</tr>
+<tr>
+<td><code>schema_drift_events</code></td>
+<td><code>s3://chakra-lakehouse/governance/schema_drift_events/</code></td>
+<td>365 days</td>
+</tr>
+</tbody>
+</table>
+<p>All tables use Iceberg v2 with the same AWS Glue catalog as the medallion layers. Time travel works identically: <code>iceberg_scan('...', version = '2024-03-14T00:00:00')</code> queries governance data as it existed at that timestamp.</p>
 
 
 
