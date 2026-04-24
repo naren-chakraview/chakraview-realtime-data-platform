@@ -1,16 +1,19 @@
 """
 Silver Layer Flink Job: Bronze → Silver
 
-Reads OrderPlaced events from the Bronze Iceberg table, validates,
+Reads OrderPlaced events from Redpanda (Kafka-compatible API), validates,
 deduplicates, and writes to the Silver Iceberg table. Malformed or
 duplicate events are routed to the DLQ side output.
+
+Broker: Redpanda — uses Kafka wire protocol; KafkaSource/KafkaSink
+connect unchanged. Set REDPANDA_BOOTSTRAP_SERVERS in the environment.
 
 SLAs governed by: contracts/data-products/orders-analytics.yaml
   - silver_freshness.max_lag_seconds: 120
   - dlq_rate.max_per_hour: 10
 
 Exactly-once guarantee:
-  Kafka read (COMMITTED isolation)
+  Redpanda read (COMMITTED isolation, Kafka API)
   → Flink checkpoint (60s interval, RocksDB backend)
   → Iceberg FlinkSink (transactional commit on checkpoint)
 """
@@ -122,10 +125,13 @@ def build_job(env: StreamExecutionEnvironment) -> None:
     env.get_checkpoint_config().set_min_pause_between_checkpoints(30_000)
     env.get_checkpoint_config().set_checkpoint_timeout(120_000)
 
-    # ── Kafka source ──────────────────────────────────────────────────────
+    # ── Redpanda source (Kafka-compatible) ───────────────────────────────
+    # Redpanda exposes the full Kafka protocol — KafkaSource connects
+    # without modification. Point REDPANDA_BOOTSTRAP_SERVERS at the
+    # Redpanda broker address (default port 9092).
     kafka_source = (
         KafkaSource.builder()
-        .set_bootstrap_servers(os.environ["KAFKA_BOOTSTRAP_SERVERS"])
+        .set_bootstrap_servers(os.environ["REDPANDA_BOOTSTRAP_SERVERS"])
         .set_topics("chakra.orders.placed")
         .set_group_id("flink-silver-orders")
         .set_starting_offsets(KafkaOffsetResetStrategy.EARLIEST)
@@ -150,7 +156,7 @@ def build_job(env: StreamExecutionEnvironment) -> None:
     stream = env.from_source(
         kafka_source,
         watermark_strategy,
-        "orders-kafka-source",
+        "orders-redpanda-source",
     )
 
     # ── Validate and deduplicate ──────────────────────────────────────────
@@ -175,8 +181,8 @@ def build_job(env: StreamExecutionEnvironment) -> None:
     # TODO (agent task): wire FlinkSink from pyiceberg-flink integration
     # See: ai-agents/tasks/agent/implement-flink-iceberg-sink.md
 
-    # ── DLQ sink (Kafka topic) ────────────────────────────────────────────
-    # TODO (agent task): wire KafkaSink to chakra.orders.dlq
+    # ── DLQ sink (Redpanda topic) ─────────────────────────────────────────
+    # TODO (agent task): wire KafkaSink to chakra.orders.dlq on Redpanda
     # DLQ events must include all fields from contracts/data-products/orders-analytics.yaml#dead_letter
 
     env.execute("silver-layer-orders")

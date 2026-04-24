@@ -43,11 +43,12 @@ slos:
     error_budget_minutes: 43.2
     definition: >
       Percentage of time the Flink silver-layer job is actively processing events
-      (consumer lag < 30 seconds). Measured via Kafka consumer lag metric.
+      (consumer lag < 30 seconds). Measured via Redpanda consumer group lag metric
+      (exported via Redpanda's Prometheus-compatible /metrics endpoint).
     prometheus_query: |
       1 - (
         sum_over_time(
-          (kafka_consumer_lag_seconds{group="flink-silver-orders"} > 30)[30d:1m]
+          (redpanda_kafka_consumer_group_lag{group="flink-silver-orders"} > 30)[30d:1m]
         ) / (30 * 24 * 60)
       )
     alert_tiers:

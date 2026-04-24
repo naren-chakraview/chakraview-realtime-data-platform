@@ -10,9 +10,9 @@ Three implementation layers move data from PostgreSQL WAL to queryable Gold Iceb
 
 ---
 
-## Debezium CDC
+## Debezium CDC → Redpanda
 
-The entry point: PostgreSQL WAL → Kafka Avro messages within milliseconds of a database commit.
+The entry point: PostgreSQL WAL → Redpanda Avro messages within milliseconds of a database commit. Redpanda exposes the Kafka wire protocol — all Debezium connectors and Flink clients connect unchanged.
 
 ### Connector Configuration
 
@@ -50,8 +50,12 @@ The entry point: PostgreSQL WAL → Kafka Avro messages within milliseconds of a
 |---|---|---|
 | `slot.name` | `debezium_orders` | Dedicated slot — shared slots block WAL recycling when any connector falls behind |
 | `heartbeat.interval.ms` | `30000` | Idle tables still emit heartbeats; prevents slot from blocking WAL recycling |
-| `offset.storage.topic` | `_debezium_offsets` | Kafka-native offset storage; survives connector restarts without external state |
+| `offset.storage.topic` | `_debezium_offsets` | Redpanda topic for offset storage; survives connector restarts |
 | `errors.deadletterqueue` | `chakra.orders.dlq` | Schema violations route to DLQ rather than stalling the connector |
+| `SCHEMA_REGISTRY_URL` | `https://redpanda:8081` | Redpanda's built-in SR — no separate service; same Confluent-compatible API |
+
+!!! tip "Non-CDC sources"
+    For source databases without WAL access, [ADR-0010](../adrs/ADR-0010-non-cdc-ingestion-patterns.md) documents the outbox pattern, timestamp polling, and trigger-based approaches with a decision matrix.
 
 ---
 

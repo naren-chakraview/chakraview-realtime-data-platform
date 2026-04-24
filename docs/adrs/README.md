@@ -15,3 +15,4 @@ ADRs follow [MADR format](https://adr.github.io/madr/). Every architectural choi
 | [ADR-0007](ADR-0007-flink-stream-processing.md) | Apache Flink for Stream Processing | Accepted |
 | [ADR-0008](ADR-0008-data-product-ownership.md) | Data Product Ownership Model | Accepted |
 | [ADR-0009](ADR-0009-data-governance.md) | Data Governance — Quality, Observability, Lineage | Accepted |
+| [ADR-0010](ADR-0010-non-cdc-ingestion-patterns.md) | Ingestion Patterns for Non-CDC Sources | Accepted |

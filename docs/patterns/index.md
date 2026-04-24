@@ -6,23 +6,24 @@ tags: [patterns]
 
 # Pattern Catalogue
 
-Eight patterns are demonstrated in this platform. Each is backed by an ADR, a concrete implementation file, and links to the contract that motivates it.
+Ten patterns are demonstrated in this platform. Each is backed by an ADR, a concrete implementation file, and links to the contract that motivates it.
 
 ---
 
-## CDC via Debezium
+## CDC via Debezium → Redpanda
 
 **ADR**: [ADR-0003](../adrs/ADR-0003-debezium-cdc.md) · **Type**: Ingestion
 
-Change Data Capture reads the PostgreSQL Write-Ahead Log directly. No polling, no `updated_at` timestamp columns, no application code changes. Every INSERT, UPDATE, and DELETE is captured with the full before/after state within milliseconds of the database commit.
+Change Data Capture reads the PostgreSQL Write-Ahead Log directly. No polling, no `updated_at` timestamp columns, no application code changes. Every INSERT, UPDATE, and DELETE is captured with the full before/after state within milliseconds of the database commit. Events are published to **Redpanda** — a Kafka-compatible broker with a built-in Schema Registry and S3 tiered storage, replacing the Kafka + ZooKeeper + Confluent SR stack.
 
 The critical operational decision: each connector gets a **dedicated replication slot**. A shared slot would stall WAL recycling whenever one connector fell behind, growing disk usage unboundedly. Heartbeat events every 30 seconds prevent idle-table slots from blocking WAL recycling even when no data changes occur.
 
 !!! example "Reference Implementation"
     | File | Purpose |
     |---|---|
-    | [`pipeline/debezium/orders-source-connector.json`](https://github.com/naren-chakraview/chakraview-realtime-data-platform/blob/main/pipeline/debezium/orders-source-connector.json) | Full connector config: slot name, heartbeats, SMTs, DLQ routing, offset storage topic |
-    | [`contracts/schemas/inventory-updated-v1.avsc`](https://github.com/naren-chakraview/chakraview-realtime-data-platform/blob/main/contracts/schemas/inventory-updated-v1.avsc) | Avro schema with `before`/`after`/`source.lsn` envelope — the CDC output contract |
+    | [`pipeline/debezium/orders-source-connector.json`](https://github.com/naren-chakraview/chakraview-realtime-data-platform/blob/main/pipeline/debezium/orders-source-connector.json) | Full connector config targeting Redpanda: slot name, heartbeats, SMTs, DLQ routing |
+    | [`infrastructure/redpanda/redpanda-cluster.yaml`](https://github.com/naren-chakraview/chakraview-realtime-data-platform/blob/main/infrastructure/redpanda/redpanda-cluster.yaml) | Redpanda Kubernetes StatefulSet with tiered S3 storage and built-in Schema Registry |
+    | [`contracts/schemas/inventory-updated-v1.avsc`](https://github.com/naren-chakraview/chakraview-realtime-data-platform/blob/main/contracts/schemas/inventory-updated-v1.avsc) | Avro schema with `before`/`after`/`source.lsn` envelope — CDC output contract |
 
 **Key config choices in the connector:**
 ```json
@@ -32,21 +33,24 @@ The critical operational decision: each connector gets a **dedicated replication
 "errors.deadletterqueue.topic.name": "chakra.orders.dlq"
 ```
 
+!!! tip "When WAL CDC is not available"
+    Not every source database supports WAL-based CDC. The **outbox pattern**, timestamp polling, and database triggers are documented in [ADR-0010](../adrs/ADR-0010-non-cdc-ingestion-patterns.md) with a decision matrix for when each applies.
+
 ---
 
 ## Kappa Architecture
 
 **ADR**: [ADR-0001](../adrs/ADR-0001-kappa-architecture.md) · **Type**: Architecture
 
-A single Apache Flink pipeline handles all data from source to Gold. There is no batch layer, no dual codebase, no nightly reconciliation job. When a Flink job bug corrupts Silver data, reprocessing means replaying the Kafka log from the affected offset with the fixed job — the same code path that runs continuously.
+A single Apache Flink pipeline handles all data from source to Gold. There is no batch layer, no dual codebase, no nightly reconciliation job. When a Flink job bug corrupts Silver data, reprocessing means replaying the Redpanda log from the affected offset with the fixed job — the same code path that runs continuously.
 
 This was only viable once Flink achieved true exactly-once semantics. Without it, the correctness guarantee required a separate batch layer (Lambda). Flink 1.15+ with Iceberg's transactional commit protocol eliminates that requirement.
 
 !!! example "Reference Implementation"
     | File | Purpose |
     |---|---|
-    | [`pipeline/flink/silver_layer_job.py`](https://github.com/naren-chakraview/chakraview-realtime-data-platform/blob/main/pipeline/flink/silver_layer_job.py) | The single processing path: Kafka → validate → deduplicate → Iceberg Silver |
-    | [`contracts/data-products/orders-analytics.yaml`](https://github.com/naren-chakraview/chakraview-realtime-data-platform/blob/main/contracts/data-products/orders-analytics.yaml) | `kafka_retention_days: 30` — the Kappa reprocessing window |
+    | [`pipeline/flink/silver_layer_job.py`](https://github.com/naren-chakraview/chakraview-realtime-data-platform/blob/main/pipeline/flink/silver_layer_job.py) | The single processing path: Redpanda → validate → deduplicate → Iceberg Silver |
+    | [`contracts/data-products/orders-analytics.yaml`](https://github.com/naren-chakraview/chakraview-realtime-data-platform/blob/main/contracts/data-products/orders-analytics.yaml) | `kafka_retention_days: 30` — the Kappa reprocessing window (stored in Redpanda tiered storage) |
 
 **Reprocessing procedure** (documented in ADR-0001):
 
@@ -113,15 +117,17 @@ Three Iceberg table layers, each with different quality guarantees, retention, a
 
 **ADR**: [ADR-0006](../adrs/ADR-0006-avro-schema-registry.md) · **Type**: Schema Governance
 
-Every Kafka topic uses Avro with `BACKWARD_TRANSITIVE` compatibility enforced by the Schema Registry. A producer cannot publish a message that breaks any existing consumer version — the Schema Registry rejects the write before the message reaches the broker.
+Every Redpanda topic uses Avro with `BACKWARD_TRANSITIVE` compatibility enforced by **Redpanda's built-in Schema Registry** (port 8081, Confluent-compatible API). A producer cannot publish a message that breaks any existing consumer version — the Schema Registry rejects the write before the message reaches the broker. No separate Schema Registry service is deployed; the SR is embedded in the Redpanda broker.
 
-`BACKWARD_TRANSITIVE` (not just `BACKWARD`) means any consumer schema version can read any historical message, including the full Kafka log. This makes the Kappa reprocessing guarantee complete: replaying from the earliest offset never encounters an incompatible schema.
+`BACKWARD_TRANSITIVE` (not just `BACKWARD`) means any consumer schema version can read any historical message, including the full topic log. This makes the Kappa reprocessing guarantee complete: replaying from the earliest offset never encounters an incompatible schema.
 
 !!! example "Reference Implementation"
     | File | Purpose |
     |---|---|
     | [`contracts/schemas/order-placed-v1.avsc`](https://github.com/naren-chakraview/chakraview-realtime-data-platform/blob/main/contracts/schemas/order-placed-v1.avsc) | Full Avro schema with logicalTypes: `uuid`, `timestamp-millis`; `metadata.trace_id` for tracing correlation |
     | [`contracts/schemas/inventory-updated-v1.avsc`](https://github.com/naren-chakraview/chakraview-realtime-data-platform/blob/main/contracts/schemas/inventory-updated-v1.avsc) | CDC envelope schema: `operation` enum, `before`/`after` union types, `source.lsn` for WAL ordering |
+    | [`contracts/schemas/outbox-event-v1.avsc`](https://github.com/naren-chakraview/chakraview-realtime-data-platform/blob/main/contracts/schemas/outbox-event-v1.avsc) | Outbox envelope schema for sources without WAL CDC support |
+    | [`infrastructure/redpanda/redpanda-cluster.yaml`](https://github.com/naren-chakraview/chakraview-realtime-data-platform/blob/main/infrastructure/redpanda/redpanda-cluster.yaml) | Redpanda cluster with built-in SR — `schema_registry_replication_factor: 3` |
 
 **Iceberg field ID benefit**: Iceberg identifies columns by integer field ID, not by name. When a source column is renamed, the Avro schema uses an alias; Iceberg's field ID mapping means existing Silver Parquet files are still readable without rewrite. Schema evolution propagates from source to Gold without a migration job.
 

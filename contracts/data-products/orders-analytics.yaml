@@ -8,12 +8,13 @@ description: >
   tables are internal pipeline concerns.
 
 source:
-  kafka_topic: chakra.orders.placed
+  kafka_topic: chakra.orders.placed       # topic name; broker is Redpanda (Kafka-compatible API)
   schema: contracts/schemas/order-placed-v1.avsc
-  kafka_retention_days: 30
+  kafka_retention_days: 30               # Redpanda tiered-storage retention; enables Kappa reprocessing
   description: >
-    30 days of Kafka retention supports full Silver reprocessing after a
-    pipeline bug (Kappa reprocessing window — ADR-0001).
+    30 days of Redpanda topic retention supports full Silver reprocessing after a
+    pipeline bug (Kappa reprocessing window — ADR-0001). Redpanda tiered storage
+    offloads older segments to S3, keeping broker disk bounded.
 
 slas:
   ingestion_freshness:
@@ -48,7 +49,7 @@ slas:
     value: 99.9
     unit: percent
     definition: >
-      Percentage of OrderPlaced events in Kafka that appear in the Gold
+      Percentage of OrderPlaced events in Redpanda that appear in the Gold
       layer within gold_freshness.max_lag_minutes + 2 minutes.
       Events in the DLQ count as incomplete.
 

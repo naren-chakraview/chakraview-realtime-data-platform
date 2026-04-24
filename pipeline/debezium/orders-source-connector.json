@@ -3,10 +3,10 @@
   "config": {
     "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
 
-    "database.hostname":    "${file:/opt/kafka/secrets/orders-db.properties:hostname}",
+    "database.hostname":    "${file:/opt/redpanda/secrets/orders-db.properties:hostname}",
     "database.port":        "5432",
-    "database.user":        "${file:/opt/kafka/secrets/orders-db.properties:username}",
-    "database.password":    "${file:/opt/kafka/secrets/orders-db.properties:password}",
+    "database.user":        "${file:/opt/redpanda/secrets/orders-db.properties:username}",
+    "database.password":    "${file:/opt/redpanda/secrets/orders-db.properties:password}",
     "database.dbname":      "orders",
     "database.server.name": "chakra-orders",
 

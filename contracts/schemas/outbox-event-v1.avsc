@@ -1,0 +1,57 @@
+{
+  "type": "record",
+  "name": "OutboxEvent",
+  "namespace": "com.chakraview.outbox.v1",
+  "doc": "Canonical outbox envelope — wraps any domain event for transactional publication via Debezium outbox SMT. The payload field carries the domain event as a JSON string so the outbox table schema remains stable as domain event schemas evolve.",
+  "fields": [
+    {
+      "name": "id",
+      "type": { "type": "string", "logicalType": "uuid" },
+      "doc": "Outbox row ID — used as Redpanda message key for partition ordering per aggregate"
+    },
+    {
+      "name": "aggregate_type",
+      "type": "string",
+      "doc": "Bounded context aggregate type, e.g. Order, StockItem, Customer. Maps to Redpanda topic via Debezium outbox SMT topic routing."
+    },
+    {
+      "name": "aggregate_id",
+      "type": { "type": "string", "logicalType": "uuid" },
+      "doc": "ID of the aggregate instance that produced this event"
+    },
+    {
+      "name": "event_type",
+      "type": "string",
+      "doc": "Domain event name, e.g. OrderConfirmed, StockReserved, CustomerRegistered"
+    },
+    {
+      "name": "payload",
+      "type": "string",
+      "doc": "JSON-encoded domain event payload. Schema governed by the event-specific Avro schema in contracts/schemas/ — serialised as string here to decouple outbox table schema from event schema evolution."
+    },
+    {
+      "name": "created_at",
+      "type": { "type": "long", "logicalType": "timestamp-millis" },
+      "doc": "Wall-clock time of the originating database transaction commit"
+    },
+    {
+      "name": "metadata",
+      "type": {
+        "type": "record",
+        "name": "OutboxMetadata",
+        "fields": [
+          {
+            "name": "trace_id",
+            "type": "string",
+            "doc": "Distributed trace ID for correlation across Debezium → Redpanda → Flink → Iceberg"
+          },
+          {
+            "name": "source_service",
+            "type": "string",
+            "doc": "Name of the microservice that wrote this outbox row, e.g. orders-service"
+          }
+        ]
+      }
+    }
+  ]
+}

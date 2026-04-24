@@ -1,0 +1,142 @@
+# Redpanda cluster configuration — replaces Apache Kafka + ZooKeeper + Confluent Schema Registry
+#
+# Single StatefulSet with Redpanda's built-in:
+#   - Kafka-compatible API (port 9092)
+#   - Schema Registry (port 8081, Confluent SR API)
+#   - Admin API (port 9644)
+#   - Prometheus metrics (port 9644/metrics)
+#
+# Tiered storage to S3 keeps broker disk bounded while maintaining
+# the 30-day Kappa reprocessing window from the data product contracts.
+#
+# ADR: docs/adrs/ADR-0003-debezium-cdc.md (message bus selection section)
+
+apiVersion: cluster.redpanda.com/v1alpha1
+kind: Redpanda
+metadata:
+  name: chakra-redpanda
+  namespace: chakra-streaming
+spec:
+  chartRef: {}
+  clusterSpec:
+    statefulset:
+      replicas: 3
+
+    storage:
+      persistentVolume:
+        enabled: true
+        size: 200Gi
+        storageClass: gp3
+
+    # Tiered storage: keeps broker disk at 200Gi while retaining 30 days of
+    # topic data in S3 for Kappa reprocessing (kafka_retention_days: 30 in
+    # contracts/data-products/orders-analytics.yaml)
+    config:
+      cluster:
+        cloud_storage_enabled: true
+        cloud_storage_region: us-east-1
+        cloud_storage_bucket: chakra-redpanda-tiered-storage
+        cloud_storage_credentials_source: aws_instance_metadata
+
+        # Redpanda-internal Raft settings
+        internal_topic_replication_factor: 3
+
+        # Schema Registry compatibility — enforces BACKWARD_TRANSITIVE
+        # per ADR-0006. This is the built-in SR; no separate service needed.
+        schema_registry_replication_factor: 3
+
+      tuning:
+        tune_aio_events: true
+        tune_cpu: true
+
+    listeners:
+      kafka:
+        port: 9092
+        tls:
+          enabled: true
+          cert: tls-kafka
+      schemaRegistry:
+        port: 8081
+        tls:
+          enabled: true
+          cert: tls-schema-registry
+      admin:
+        port: 9644
+
+    resources:
+      cpu:
+        cores: 4
+      memory:
+        container:
+          max: 8Gi
+        redpanda:
+          memory: 6Gi
+          reserveMemory: 1Gi
+
+    serviceAccount:
+      annotations:
+        # IRSA role for S3 tiered storage access
+        eks.amazonaws.com/role-arn: arn:aws:iam::ACCOUNT_ID:role/chakra-redpanda-s3
+
+---
+# Kafka Connect deployment — separate from Redpanda broker
+# Hosts Debezium source connectors; communicates with Redpanda via Kafka API
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kafka-connect
+  namespace: chakra-streaming
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: kafka-connect
+  template:
+    metadata:
+      labels:
+        app: kafka-connect
+    spec:
+      containers:
+        - name: kafka-connect
+          image: debezium/connect:2.6
+          env:
+            - name: BOOTSTRAP_SERVERS
+              value: "chakra-redpanda.chakra-streaming.svc.cluster.local:9092"
+            - name: GROUP_ID
+              value: "debezium-connect-cluster"
+            - name: CONFIG_STORAGE_TOPIC
+              value: "_connect_configs"
+            - name: OFFSET_STORAGE_TOPIC
+              value: "_debezium_offsets"
+            - name: STATUS_STORAGE_TOPIC
+              value: "_connect_status"
+            # Redpanda's built-in SR — no separate service URL needed
+            - name: SCHEMA_REGISTRY_URL
+              value: "https://chakra-redpanda.chakra-streaming.svc.cluster.local:8081"
+          ports:
+            - containerPort: 8083
+          resources:
+            requests:
+              cpu: "1"
+              memory: 2Gi
+            limits:
+              cpu: "2"
+              memory: 4Gi
+
+---
+# ServiceMonitor for Prometheus scraping of Redpanda metrics
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: redpanda
+  namespace: chakra-streaming
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: redpanda
+  endpoints:
+    - port: admin
+      path: /metrics
+      interval: 30s
+      # Redpanda exports Kafka-compatible metric names under the
+      # redpanda_kafka_* prefix — used in observability/slos/orders-analytics-slo.yaml
