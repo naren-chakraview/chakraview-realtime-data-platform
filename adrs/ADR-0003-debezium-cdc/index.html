@@ -79,7 +79,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#adr-0003-debezium-for-change-data-capture" class="md-skip">
+        <a href="#adr-0003-debezium-for-change-data-capture-redpanda-as-message-bus" class="md-skip">
           Skip to content
         </a>
       
@@ -1225,6 +1225,8 @@
       
         
       
+        
+      
     
     
     
@@ -1418,13 +1420,102 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#decision" class="md-nav__link">
+  <a href="#decision-1-debezium-for-change-data-capture" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Decision
+        Decision 1: Debezium for Change Data Capture
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Decision 1: Debezium for Change Data Capture">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#when-wal-based-cdc-is-not-available" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        When WAL-based CDC is not available
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#decision-2-redpanda-as-message-bus" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Decision 2: Redpanda as Message Bus
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Decision 2: Redpanda as Message Bus">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#alternatives-considered" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Alternatives Considered
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-redpanda-over-kafka" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why Redpanda over Kafka
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-not-pulsar" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why not Pulsar
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-not-kinesis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why not Kinesis
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-not-rabbitmq" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why not RabbitMQ
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1638,6 +1729,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ADR-0010-non-cdc-ingestion-patterns/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-0010 Non-CDC Ingestion Patterns
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1685,13 +1804,102 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#decision" class="md-nav__link">
+  <a href="#decision-1-debezium-for-change-data-capture" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Decision
+        Decision 1: Debezium for Change Data Capture
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Decision 1: Debezium for Change Data Capture">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#when-wal-based-cdc-is-not-available" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        When WAL-based CDC is not available
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#decision-2-redpanda-as-message-bus" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Decision 2: Redpanda as Message Bus
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Decision 2: Redpanda as Message Bus">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#alternatives-considered" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Alternatives Considered
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-redpanda-over-kafka" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why Redpanda over Kafka
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-not-pulsar" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why not Pulsar
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-not-kinesis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why not Kinesis
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-not-rabbitmq" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why not RabbitMQ
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1748,51 +1956,141 @@
   
 
 
-<h1 id="adr-0003-debezium-for-change-data-capture">ADR-0003: Debezium for Change Data Capture<a class="headerlink" href="#adr-0003-debezium-for-change-data-capture" title="Permanent link">&para;</a></h1>
-<p><strong>Status</strong>: Accepted
+<h1 id="adr-0003-debezium-for-change-data-capture-redpanda-as-message-bus">ADR-0003: Debezium for Change Data Capture + Redpanda as Message Bus<a class="headerlink" href="#adr-0003-debezium-for-change-data-capture-redpanda-as-message-bus" title="Permanent link">&para;</a></h1>
+<p><strong>Status</strong>: Accepted (updated 2024-09-12 to adopt Redpanda)
 <strong>Date</strong>: 2024-04-01
 <strong>Deciders</strong>: Data platform team</p>
 <hr />
 <h2 id="context">Context<a class="headerlink" href="#context" title="Permanent link">&para;</a></h2>
-<p>The Chakra Commerce transactional databases (PostgreSQL for Orders, Inventory, Customers; Oracle for the legacy WMS) must stream changes into Kafka without polling the application tables. Three approaches were considered:</p>
+<p>The Chakra Commerce transactional databases (PostgreSQL for Orders, Inventory, Customers; Oracle for the legacy WMS) must stream changes into a message bus without polling the application tables. Two questions were answered independently:</p>
 <ol>
-<li><strong>Application-level dual-write</strong>: The application writes to both its database and Kafka.</li>
-<li><strong>Polling (JDBC source connector)</strong>: A Kafka connector queries the database on a schedule using a <code>updated_at</code> timestamp column.</li>
-<li><strong>WAL-based CDC (Debezium)</strong>: A connector reads the database's write-ahead log and emits every committed transaction as an event.</li>
+<li><strong>How do we capture changes from the source database?</strong> (ingestion pattern)</li>
+<li><strong>What message bus receives and holds those changes?</strong> (broker selection)</li>
 </ol>
 <hr />
-<h2 id="decision">Decision<a class="headerlink" href="#decision" title="Permanent link">&para;</a></h2>
-<p>Use <strong>Debezium</strong> with WAL-based CDC for all source databases.</p>
-<p><strong>Against dual-write</strong>: Application teams are not responsible for the analytics pipeline. Requiring every microservice to emit Kafka events for the data platform couples the application deployment to the analytics deployment. It also cannot capture deletes or schema changes reliably.</p>
-<p><strong>Against polling</strong>: Polling misses deletes (unless a soft-delete pattern is used), has inherent latency bounded by the poll interval, and imposes read load on the production database. It also cannot observe the before/after state of an update — only the final state.</p>
-<p><strong>For Debezium</strong>: WAL reading has near-zero production database impact (replication slot reads are sequential I/O). It captures inserts, updates, and deletes with full before/after state. Initial snapshot mode bootstraps the Bronze layer with the full current table state before switching to log-based streaming. Schema changes in the source database are reflected in Debezium events automatically.</p>
+<h2 id="decision-1-debezium-for-change-data-capture">Decision 1: Debezium for Change Data Capture<a class="headerlink" href="#decision-1-debezium-for-change-data-capture" title="Permanent link">&para;</a></h2>
+<p>Three ingestion approaches were considered:</p>
+<ol>
+<li><strong>Application-level dual-write</strong>: Application writes to both its database and the broker.</li>
+<li><strong>Polling (JDBC source connector)</strong>: A connector queries the database on a schedule using an <code>updated_at</code> timestamp column.</li>
+<li><strong>WAL-based CDC (Debezium)</strong>: A connector reads the database's write-ahead log and emits every committed transaction as an event.</li>
+</ol>
+<p><strong>Against dual-write</strong>: Application teams are not responsible for the analytics pipeline. Coupling every microservice to the data platform creates deployment dependencies and cannot capture deletes or schema changes reliably.</p>
+<p><strong>Against polling</strong>: Polling misses hard deletes entirely (unless a soft-delete pattern is used), has inherent latency bounded by the poll interval, imposes read load on the production database, and cannot observe the <code>before</code> state of an update — only the final state.</p>
+<p><strong>For Debezium</strong>: WAL reading has near-zero production database impact (replication slot reads are sequential I/O). It captures inserts, updates, and deletes with full before/after state. Initial snapshot mode bootstraps the Bronze layer with complete current table state before switching to log-based streaming. Schema changes in the source database are reflected automatically.</p>
+<h3 id="when-wal-based-cdc-is-not-available">When WAL-based CDC is not available<a class="headerlink" href="#when-wal-based-cdc-is-not-available" title="Permanent link">&para;</a></h3>
+<p>Not every source database supports WAL-based CDC. The decision tree for non-CDC sources is documented in <a href="../ADR-0010-non-cdc-ingestion-patterns/">ADR-0010</a>.</p>
+<hr />
+<h2 id="decision-2-redpanda-as-message-bus">Decision 2: Redpanda as Message Bus<a class="headerlink" href="#decision-2-redpanda-as-message-bus" title="Permanent link">&para;</a></h2>
+<h3 id="alternatives-considered">Alternatives Considered<a class="headerlink" href="#alternatives-considered" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Broker</th>
+<th>Protocol</th>
+<th>Schema Registry</th>
+<th>Ops complexity</th>
+<th>Verdict</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Apache Kafka (self-managed)</strong></td>
+<td>Kafka native</td>
+<td>External (Confluent/Apicurio)</td>
+<td>High — ZooKeeper (pre-3.x) or KRaft quorum + broker fleet + Connect cluster</td>
+<td>Rejected</td>
+</tr>
+<tr>
+<td><strong>AWS MSK (managed Kafka)</strong></td>
+<td>Kafka native</td>
+<td>External (Glue Schema Registry or MSK Serverless SR)</td>
+<td>Medium — AWS manages brokers, still need Connect</td>
+<td>Considered</td>
+</tr>
+<tr>
+<td><strong>Redpanda</strong></td>
+<td>Kafka-compatible</td>
+<td><strong>Built-in</strong> (Confluent-compatible API)</td>
+<td>Low — single binary, no ZooKeeper, no KRaft quorum, no separate SR service</td>
+<td><strong>Selected</strong></td>
+</tr>
+<tr>
+<td><strong>Apache Pulsar</strong></td>
+<td>Pulsar + KoP</td>
+<td>Built-in</td>
+<td>High — stateless brokers + Apache BookKeeper cluster + ZooKeeper</td>
+<td>Rejected</td>
+</tr>
+<tr>
+<td><strong>AWS Kinesis</strong></td>
+<td>Kinesis</td>
+<td>None</td>
+<td>Low (managed)</td>
+<td>Rejected — see below</td>
+</tr>
+<tr>
+<td><strong>RabbitMQ</strong></td>
+<td>AMQP</td>
+<td>None</td>
+<td>Low</td>
+<td>Rejected — see below</td>
+</tr>
+</tbody>
+</table>
+<h3 id="why-redpanda-over-kafka">Why Redpanda over Kafka<a class="headerlink" href="#why-redpanda-over-kafka" title="Permanent link">&para;</a></h3>
+<p>Redpanda implements the full Kafka wire protocol (Kafka API v0–v13). Every Kafka client — Debezium Kafka Connect, Flink's <code>KafkaSource</code>, <code>KafkaSink</code>, the Confluent Avro serializer — connects to Redpanda without code changes. The migration path is a bootstrap server address change.</p>
+<p>The operational advantage is significant:</p>
+<ul>
+<li><strong>No ZooKeeper or KRaft quorum to operate</strong>: Redpanda uses the Raft consensus protocol internally; there is no separate coordination layer.</li>
+<li><strong>Built-in Schema Registry</strong>: Redpanda ships with a Confluent-compatible Schema Registry on port 8081. There is no separate SR service to deploy, monitor, or patch. The <code>SCHEMA_REGISTRY_URL</code> environment variable simply points at the Redpanda broker.</li>
+<li><strong>Tiered storage to S3 built-in</strong>: Kafka requires Confluent Tiered Storage or a third-party plugin for S3 offload. Redpanda's tiered storage is a first-class feature — this enables the 30-day Kappa reprocessing window without proportionally large local disk.</li>
+<li><strong>Single binary</strong>: Redpanda runs as a single <code>rpk</code> binary per node. The operator surface area is substantially smaller than a Kafka + ZooKeeper + Schema Registry + Kafka Connect stack.</li>
+</ul>
+<p>Performance characteristics:
+- Tail latency (p99): Redpanda's C++ implementation avoids JVM GC pauses that cause Kafka's p99 latency spikes under backpressure. At the throughput volumes this platform operates, the difference is measurable but not the primary reason for selection.</p>
+<h3 id="why-not-pulsar">Why not Pulsar<a class="headerlink" href="#why-not-pulsar" title="Permanent link">&para;</a></h3>
+<p>Pulsar's compute/storage separation (stateless brokers + Apache BookKeeper) is architecturally appealing for independent scaling. However:</p>
+<ul>
+<li>BookKeeper is a non-trivial distributed system to operate alongside Redpanda or Kafka</li>
+<li>Debezium's Pulsar connector is less mature than its Kafka connector; the Kafka-on-Pulsar (KoP) compatibility layer introduces a translation layer with subtle behavioral differences</li>
+<li>Flink's Pulsar connector has fewer production examples for the exactly-once + Iceberg commit pattern</li>
+</ul>
+<p>Pulsar is worth re-evaluating if multi-datacenter active-active geo-replication becomes a requirement (Pulsar's replication is first-class; Kafka/Redpanda require MirrorMaker 2).</p>
+<h3 id="why-not-kinesis">Why not Kinesis<a class="headerlink" href="#why-not-kinesis" title="Permanent link">&para;</a></h3>
+<p>AWS Kinesis has a maximum retention of 7 days (extendable to 365 days at significant cost). The data product contract specifies <code>retention_days: 30</code> for Kappa reprocessing. More critically, Kinesis shards are fixed at creation and cannot be re-partitioned without re-creating the stream. The Kappa reprocessing requirement (reset consumer group to arbitrary offset, replay) is supported but the operational model differs significantly from the Kafka API.</p>
+<h3 id="why-not-rabbitmq">Why not RabbitMQ<a class="headerlink" href="#why-not-rabbitmq" title="Permanent link">&para;</a></h3>
+<p>RabbitMQ is a traditional message queue: once a message is consumed it is deleted. There is no concept of an offset log or consumer group reset. The Kappa architecture's reprocessing guarantee — replay from the start of the affected window with a fixed job — is architecturally impossible with RabbitMQ.</p>
 <hr />
 <h2 id="connector-configuration-decisions">Connector Configuration Decisions<a class="headerlink" href="#connector-configuration-decisions" title="Permanent link">&para;</a></h2>
 <p><strong>Replication slot per connector</strong>: Each Debezium connector uses a dedicated PostgreSQL replication slot. A shared slot would block the WAL from being discarded if one connector falls behind.</p>
 <p><strong>Heartbeat events</strong>: Debezium emits a heartbeat event every 30 seconds on idle tables. Without heartbeats, a replication slot on a low-traffic table blocks WAL recycling indefinitely, growing the WAL unboundedly.</p>
 <p><strong>SMTs (Single Message Transforms)</strong>: Applied at the connector level to:
-- Extract the <code>after</code> image for inserts/updates (the Bronze layer stores the full envelope, but downstream consumers rarely need <code>before</code>)
+- Extract the <code>after</code> image for inserts/updates (Bronze stores the full envelope, but downstream consumers rarely need <code>before</code>)
 - Add a <code>source_db</code> field for multi-source fans
 - Route to topic names matching <code>contracts/schemas/</code> naming conventions</p>
-<p><strong>Offset storage</strong>: Connector offsets are stored in a dedicated Kafka topic (<code>_debezium_offsets</code>), not in Kafka Connect's default topic, so they survive connector restarts and cross-cluster migrations.</p>
+<p><strong>Offset storage</strong>: Connector offsets are stored in a dedicated Redpanda topic (<code>_debezium_offsets</code>), not in Kafka Connect's default topic, so they survive connector restarts and cross-cluster migrations.</p>
 <hr />
 <h2 id="consequences">Consequences<a class="headerlink" href="#consequences" title="Permanent link">&para;</a></h2>
 <p><strong>Positive:</strong>
-- Sub-second latency from source commit to Kafka message.
+- Sub-second latency from source commit to Redpanda topic.
 - No application changes required. Data platform team owns the connector; application teams own the schema.
-- Captures DDL changes: if a column is added in the source, Debezium reflects it in the next event without connector restart.
-- Initial snapshot mode provides a complete historical baseline before log-based streaming begins.</p>
+- Built-in Schema Registry eliminates the Confluent BSL licence concern from ADR-0006.
+- Tiered storage to S3 reduces broker disk costs for the 30-day Kappa reprocessing window.
+- Zero code changes in Flink jobs or Debezium connectors — the Kafka API is identical.</p>
 <p><strong>Negative:</strong>
-- Requires a PostgreSQL replication slot (and <code>wal_level = logical</code>). This is a production database configuration change — requires DBA approval and has a small WAL volume overhead.
-- The Oracle connector requires the LogMiner API, which is licenced separately in some Oracle editions. Verify licensing before enabling.
-- Debezium runs in Kafka Connect (distributed mode). Kafka Connect itself is a service that must be operated, monitored, and sized.</p>
+- Requires a PostgreSQL replication slot (and <code>wal_level = logical</code>). This is a production database configuration change — requires DBA approval.
+- The Oracle connector requires the LogMiner API, licenced separately in some Oracle editions.
+- Debezium runs in Kafka Connect (distributed mode). Kafka Connect is a JVM service that must be operated separately from Redpanda itself. Redpanda does not replace Kafka Connect.
+- Redpanda's ecosystem tooling (e.g., Redpanda Console) is newer than Kafka's (Confluent Control Center, Kafka UI). Operational runbook depth is smaller.</p>
 <hr />
 <h2 id="related">Related<a class="headerlink" href="#related" title="Permanent link">&para;</a></h2>
 <ul>
-<li><code>pipeline/debezium/orders-source-connector.json</code> — PostgreSQL connector for the Orders database</li>
-<li><code>pipeline/debezium/inventory-source-connector.json</code> — PostgreSQL connector for Inventory</li>
-<li><code>contracts/schemas/</code> — Avro schemas that the Bronze layer must produce</li>
-<li><a href="../ADR-0006-avro-schema-registry/">ADR-0006</a> — Schema Registry integration for Debezium output</li>
+<li><code>pipeline/debezium/orders-source-connector.json</code> — PostgreSQL connector, targets Redpanda</li>
+<li><code>infrastructure/redpanda/redpanda-cluster.yaml</code> — Redpanda Kubernetes StatefulSet</li>
+<li><code>contracts/schemas/</code> — Avro schemas registered in Redpanda's built-in Schema Registry</li>
+<li><a href="../ADR-0006-avro-schema-registry/">ADR-0006</a> — Avro + Schema Registry (updated for Redpanda SR)</li>
+<li><a href="../ADR-0010-non-cdc-ingestion-patterns/">ADR-0010</a> — Ingestion patterns when WAL CDC is not available</li>
 </ul>
 
 

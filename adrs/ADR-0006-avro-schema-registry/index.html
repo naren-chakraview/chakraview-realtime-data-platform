@@ -79,7 +79,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#adr-0006-avro-with-confluent-schema-registry" class="md-skip">
+        <a href="#adr-0006-avro-with-schema-registry" class="md-skip">
           Skip to content
         </a>
       
@@ -1225,6 +1225,8 @@
       
         
       
+        
+      
     
     
     
@@ -1510,6 +1512,45 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Decision">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#wire-format-avro-over-json" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Wire format: Avro over JSON
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#schema-registry-redpanda-built-in" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Schema Registry: Redpanda built-in
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#compatibility-mode-backward_transitive" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Compatibility mode: BACKWARD_TRANSITIVE
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -1638,6 +1679,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ADR-0010-non-cdc-ingestion-patterns/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-0010 Non-CDC Ingestion Patterns
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1692,6 +1761,45 @@
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Decision">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#wire-format-avro-over-json" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Wire format: Avro over JSON
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#schema-registry-redpanda-built-in" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Schema Registry: Redpanda built-in
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#compatibility-mode-backward_transitive" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Compatibility mode: BACKWARD_TRANSITIVE
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1748,40 +1856,54 @@
   
 
 
-<h1 id="adr-0006-avro-with-confluent-schema-registry">ADR-0006: Avro with Confluent Schema Registry<a class="headerlink" href="#adr-0006-avro-with-confluent-schema-registry" title="Permanent link">&para;</a></h1>
-<p><strong>Status</strong>: Accepted
+<h1 id="adr-0006-avro-with-schema-registry">ADR-0006: Avro with Schema Registry<a class="headerlink" href="#adr-0006-avro-with-schema-registry" title="Permanent link">&para;</a></h1>
+<p><strong>Status</strong>: Accepted (updated 2024-09-12 — SR now provided by Redpanda built-in)
 <strong>Date</strong>: 2024-04-01
 <strong>Deciders</strong>: Data platform team</p>
 <hr />
 <h2 id="context">Context<a class="headerlink" href="#context" title="Permanent link">&para;</a></h2>
-<p>Kafka topics carry structured events from multiple producers (Debezium connectors, application services) to multiple consumers (Flink jobs, Bronze writers). Without schema enforcement at the Kafka level, a producer can change its event structure and silently break consumers.</p>
+<p>Redpanda topics carry structured events from multiple producers (Debezium connectors, application services) to multiple consumers (Flink jobs, Bronze writers). Without schema enforcement at the broker level, a producer can change its event structure and silently break consumers.</p>
 <hr />
 <h2 id="decision">Decision<a class="headerlink" href="#decision" title="Permanent link">&para;</a></h2>
-<p>Use <strong>Avro</strong> as the wire format for all Kafka topics, governed by <strong>Confluent Schema Registry</strong> with <strong>BACKWARD_TRANSITIVE</strong> compatibility mode.</p>
-<p><strong>Why Avro over JSON</strong>: JSON schemas are not enforced at the Kafka level; a producer can send any JSON. Avro binary encoding is smaller (no field names on every message), and the Schema Registry enforces that every message is valid against a registered schema before it reaches the broker.</p>
-<p><strong>Why BACKWARD_TRANSITIVE compatibility</strong>: A consumer running schema version N must be able to read messages written with any version ≤ N. This means:
-- Adding a field with a default value is allowed.
-- Removing a field is allowed only if it had a default.
-- Renaming a field is not allowed (use an alias instead).
-- Changing a field type is not allowed.</p>
-<p>This is stricter than <code>BACKWARD</code> (which only checks N against N-1). <code>BACKWARD_TRANSITIVE</code> ensures that any consumer can be upgraded independently of the producer, and can read the full Kafka log history without needing to know which schema version wrote each message.</p>
+<p>Use <strong>Avro</strong> as the wire format for all Redpanda topics, governed by <strong>Redpanda's built-in Schema Registry</strong> with <strong>BACKWARD_TRANSITIVE</strong> compatibility mode.</p>
+<h3 id="wire-format-avro-over-json">Wire format: Avro over JSON<a class="headerlink" href="#wire-format-avro-over-json" title="Permanent link">&para;</a></h3>
+<p>JSON schemas are not enforced at the broker level — a producer can send any JSON and it will be accepted. Avro binary encoding is smaller (field names are not repeated in every message), and the Schema Registry enforces that every message is valid against a registered schema <em>before</em> it reaches the broker.</p>
+<h3 id="schema-registry-redpanda-built-in">Schema Registry: Redpanda built-in<a class="headerlink" href="#schema-registry-redpanda-built-in" title="Permanent link">&para;</a></h3>
+<p>Redpanda ships with a Schema Registry that implements the full Confluent Schema Registry REST API on port 8081. This means:</p>
+<ul>
+<li>Every Confluent-compatible client — <code>io.confluent.kafka.serializers.KafkaAvroSerializer</code>, <code>AvroRowDeserializationSchema</code> in Flink, the <code>avro-serde</code> library — connects to Redpanda's SR without code changes. <code>SCHEMA_REGISTRY_URL</code> points at the Redpanda broker address.</li>
+<li>There is no separate Schema Registry service to deploy, monitor, patch, or size. The SR lifecycle is tied to the Redpanda cluster, not to a separate JVM service.</li>
+<li>The Confluent BSL (Business Source Licence) concern that applied to self-managed Confluent Schema Registry does not apply — Redpanda's Schema Registry is Apache 2.0 licensed.</li>
+</ul>
+<p>The Apicurio Registry remains a viable alternative if the platform is deployed without Redpanda (e.g., on AWS MSK). The API is compatible; only the <code>SCHEMA_REGISTRY_URL</code> changes.</p>
+<h3 id="compatibility-mode-backward_transitive">Compatibility mode: BACKWARD_TRANSITIVE<a class="headerlink" href="#compatibility-mode-backward_transitive" title="Permanent link">&para;</a></h3>
+<p>A consumer running schema version N must be able to read messages written with any version ≤ N. This enables:</p>
+<ul>
+<li>Consumers to upgrade independently of producers — a consumer on v3 can still read messages that were written when the schema was at v1</li>
+<li>Full Kafka log replay (Kappa reprocessing) without needing to know which schema version wrote each message</li>
+<li>Safe schema evolution rules: <strong>add a field with a default</strong> (allowed), <strong>remove a field with a default</strong> (allowed), <strong>rename a field</strong> (use an alias, not allowed directly), <strong>change a field type</strong> (not allowed)</li>
+</ul>
+<p><code>BACKWARD_TRANSITIVE</code> is stricter than <code>BACKWARD</code> (which only checks version N against N−1). The stricter mode is required for the Kappa reprocessing guarantee — replaying from the earliest offset must always succeed regardless of how many schema evolutions have occurred since that message was written.</p>
 <hr />
 <h2 id="schema-naming-convention">Schema Naming Convention<a class="headerlink" href="#schema-naming-convention" title="Permanent link">&para;</a></h2>
 <p>Schemas live in <code>contracts/schemas/</code> and follow the naming pattern <code>{event-name}-v{major}.avsc</code>. The major version increments only on breaking changes (which require a migration plan). Minor additions are handled within the same major version via Avro's field-addition-with-default mechanism.</p>
+<p>The <code>contracts/schemas/</code> files are the source of truth. Registration into Redpanda's Schema Registry happens at connector deployment time via the <code>tooling/register-schemas.sh</code> script.</p>
 <hr />
 <h2 id="consequences">Consequences<a class="headerlink" href="#consequences" title="Permanent link">&para;</a></h2>
 <p><strong>Positive:</strong>
 - Schema evolution is governed: a producer cannot push a breaking change without a Schema Registry version bump that triggers CI validation.
-- Consumers use the schema ID embedded in the Avro message header to fetch the exact schema version — no out-of-band schema distribution.
-- Iceberg Bronze tables store Avro-decoded Parquet, so the schema lineage from source → Bronze → Silver is fully traceable.</p>
+- Consumers use the schema ID embedded in the Avro message header to fetch the exact schema version from Redpanda's SR — no out-of-band schema distribution.
+- Iceberg Bronze tables store Avro-decoded Parquet, so the schema lineage from source → Bronze → Silver is fully traceable.
+- No separate SR service to operate — Redpanda's built-in SR reduces the service count in the platform.</p>
 <p><strong>Negative:</strong>
-- Schema Registry is a required service. Its availability is a prerequisite for all producers and consumers. A Schema Registry outage halts all new Kafka writes.
-- The Confluent Schema Registry is source-available (BSL licence since 2023). The open-source alternative is Apicurio Registry. This reference implementation uses the Confluent implementation but documents the Apicurio migration path in <code>infrastructure/helm/charts/schema-registry/</code>.</p>
+- Schema Registry availability is still a prerequisite for all producers and consumers. Redpanda's SR is embedded in the broker, so a broker-level outage takes down both messaging and schema validation simultaneously. This is a different failure mode from a separate SR service (where the SR could be independently unavailable without affecting message flow). In practice, a Redpanda cluster outage stops the pipeline regardless of the SR, so this distinction rarely matters operationally.
+- <code>BACKWARD_TRANSITIVE</code> forbids field renames without aliases. Teams must be trained on the alias mechanism or will attempt renames that the SR rejects at write time.</p>
 <hr />
 <h2 id="related">Related<a class="headerlink" href="#related" title="Permanent link">&para;</a></h2>
 <ul>
-<li><code>contracts/schemas/</code> — All Avro schema files (human-authored)</li>
-<li><a href="../ADR-0003-debezium-cdc/">ADR-0003</a> — Debezium serializes events using these schemas</li>
+<li><code>contracts/schemas/</code> — All Avro schema files (human-authored source of truth)</li>
+<li><code>tooling/register-schemas.sh</code> — Registers schemas into Redpanda SR at deployment</li>
+<li><a href="../ADR-0003-debezium-cdc/">ADR-0003</a> — Debezium serializes events using these schemas; Redpanda selected as broker</li>
 <li><a href="../ADR-0007-flink-stream-processing/">ADR-0007</a> — Flink jobs deserialize using these schemas</li>
 </ul>
 

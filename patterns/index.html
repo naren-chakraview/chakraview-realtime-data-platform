@@ -1227,6 +1227,8 @@
       
         
       
+        
+      
     
     
     
@@ -1533,6 +1535,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adrs/ADR-0010-non-cdc-ingestion-patterns/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-0010 Non-CDC Ingestion Patterns
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1569,10 +1599,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#cdc-via-debezium" class="md-nav__link">
+  <a href="#cdc-via-debezium-redpanda" class="md-nav__link">
     <span class="md-ellipsis">
       
-        CDC via Debezium
+        CDC via Debezium → Redpanda
       
     </span>
   </a>
@@ -1699,11 +1729,11 @@
 
 
 <h1 id="pattern-catalogue">Pattern Catalogue<a class="headerlink" href="#pattern-catalogue" title="Permanent link">&para;</a></h1>
-<p>Eight patterns are demonstrated in this platform. Each is backed by an ADR, a concrete implementation file, and links to the contract that motivates it.</p>
+<p>Ten patterns are demonstrated in this platform. Each is backed by an ADR, a concrete implementation file, and links to the contract that motivates it.</p>
 <hr />
-<h2 id="cdc-via-debezium">CDC via Debezium<a class="headerlink" href="#cdc-via-debezium" title="Permanent link">&para;</a></h2>
+<h2 id="cdc-via-debezium-redpanda">CDC via Debezium → Redpanda<a class="headerlink" href="#cdc-via-debezium-redpanda" title="Permanent link">&para;</a></h2>
 <p><strong>ADR</strong>: <a href="../adrs/ADR-0003-debezium-cdc/">ADR-0003</a> · <strong>Type</strong>: Ingestion</p>
-<p>Change Data Capture reads the PostgreSQL Write-Ahead Log directly. No polling, no <code>updated_at</code> timestamp columns, no application code changes. Every INSERT, UPDATE, and DELETE is captured with the full before/after state within milliseconds of the database commit.</p>
+<p>Change Data Capture reads the PostgreSQL Write-Ahead Log directly. No polling, no <code>updated_at</code> timestamp columns, no application code changes. Every INSERT, UPDATE, and DELETE is captured with the full before/after state within milliseconds of the database commit. Events are published to <strong>Redpanda</strong> — a Kafka-compatible broker with a built-in Schema Registry and S3 tiered storage, replacing the Kafka + ZooKeeper + Confluent SR stack.</p>
 <p>The critical operational decision: each connector gets a <strong>dedicated replication slot</strong>. A shared slot would stall WAL recycling whenever one connector fell behind, growing disk usage unboundedly. Heartbeat events every 30 seconds prevent idle-table slots from blocking WAL recycling even when no data changes occur.</p>
 <div class="admonition example">
 <p class="admonition-title">Reference Implementation</p>
@@ -1717,11 +1747,15 @@
 <tbody>
 <tr>
 <td><a href="https://github.com/naren-chakraview/chakraview-realtime-data-platform/blob/main/pipeline/debezium/orders-source-connector.json"><code>pipeline/debezium/orders-source-connector.json</code></a></td>
-<td>Full connector config: slot name, heartbeats, SMTs, DLQ routing, offset storage topic</td>
+<td>Full connector config targeting Redpanda: slot name, heartbeats, SMTs, DLQ routing</td>
+</tr>
+<tr>
+<td><a href="https://github.com/naren-chakraview/chakraview-realtime-data-platform/blob/main/infrastructure/redpanda/redpanda-cluster.yaml"><code>infrastructure/redpanda/redpanda-cluster.yaml</code></a></td>
+<td>Redpanda Kubernetes StatefulSet with tiered S3 storage and built-in Schema Registry</td>
 </tr>
 <tr>
 <td><a href="https://github.com/naren-chakraview/chakraview-realtime-data-platform/blob/main/contracts/schemas/inventory-updated-v1.avsc"><code>contracts/schemas/inventory-updated-v1.avsc</code></a></td>
-<td>Avro schema with <code>before</code>/<code>after</code>/<code>source.lsn</code> envelope — the CDC output contract</td>
+<td>Avro schema with <code>before</code>/<code>after</code>/<code>source.lsn</code> envelope — CDC output contract</td>
 </tr>
 </tbody>
 </table>
@@ -1732,10 +1766,14 @@
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="nt">&quot;offset.storage.topic&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;_debezium_offsets&quot;</span><span class="p">,</span>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="nt">&quot;errors.deadletterqueue.topic.name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;chakra.orders.dlq&quot;</span>
 </span></code></pre></div></p>
+<div class="admonition tip">
+<p class="admonition-title">When WAL CDC is not available</p>
+<p>Not every source database supports WAL-based CDC. The <strong>outbox pattern</strong>, timestamp polling, and database triggers are documented in <a href="../adrs/ADR-0010-non-cdc-ingestion-patterns/">ADR-0010</a> with a decision matrix for when each applies.</p>
+</div>
 <hr />
 <h2 id="kappa-architecture">Kappa Architecture<a class="headerlink" href="#kappa-architecture" title="Permanent link">&para;</a></h2>
 <p><strong>ADR</strong>: <a href="../adrs/ADR-0001-kappa-architecture/">ADR-0001</a> · <strong>Type</strong>: Architecture</p>
-<p>A single Apache Flink pipeline handles all data from source to Gold. There is no batch layer, no dual codebase, no nightly reconciliation job. When a Flink job bug corrupts Silver data, reprocessing means replaying the Kafka log from the affected offset with the fixed job — the same code path that runs continuously.</p>
+<p>A single Apache Flink pipeline handles all data from source to Gold. There is no batch layer, no dual codebase, no nightly reconciliation job. When a Flink job bug corrupts Silver data, reprocessing means replaying the Redpanda log from the affected offset with the fixed job — the same code path that runs continuously.</p>
 <p>This was only viable once Flink achieved true exactly-once semantics. Without it, the correctness guarantee required a separate batch layer (Lambda). Flink 1.15+ with Iceberg's transactional commit protocol eliminates that requirement.</p>
 <div class="admonition example">
 <p class="admonition-title">Reference Implementation</p>
@@ -1749,11 +1787,11 @@
 <tbody>
 <tr>
 <td><a href="https://github.com/naren-chakraview/chakraview-realtime-data-platform/blob/main/pipeline/flink/silver_layer_job.py"><code>pipeline/flink/silver_layer_job.py</code></a></td>
-<td>The single processing path: Kafka → validate → deduplicate → Iceberg Silver</td>
+<td>The single processing path: Redpanda → validate → deduplicate → Iceberg Silver</td>
 </tr>
 <tr>
 <td><a href="https://github.com/naren-chakraview/chakraview-realtime-data-platform/blob/main/contracts/data-products/orders-analytics.yaml"><code>contracts/data-products/orders-analytics.yaml</code></a></td>
-<td><code>kafka_retention_days: 30</code> — the Kappa reprocessing window</td>
+<td><code>kafka_retention_days: 30</code> — the Kappa reprocessing window (stored in Redpanda tiered storage)</td>
 </tr>
 </tbody>
 </table>
@@ -1829,8 +1867,8 @@
 <hr />
 <h2 id="avro-schema-registry">Avro + Schema Registry<a class="headerlink" href="#avro-schema-registry" title="Permanent link">&para;</a></h2>
 <p><strong>ADR</strong>: <a href="../adrs/ADR-0006-avro-schema-registry/">ADR-0006</a> · <strong>Type</strong>: Schema Governance</p>
-<p>Every Kafka topic uses Avro with <code>BACKWARD_TRANSITIVE</code> compatibility enforced by the Schema Registry. A producer cannot publish a message that breaks any existing consumer version — the Schema Registry rejects the write before the message reaches the broker.</p>
-<p><code>BACKWARD_TRANSITIVE</code> (not just <code>BACKWARD</code>) means any consumer schema version can read any historical message, including the full Kafka log. This makes the Kappa reprocessing guarantee complete: replaying from the earliest offset never encounters an incompatible schema.</p>
+<p>Every Redpanda topic uses Avro with <code>BACKWARD_TRANSITIVE</code> compatibility enforced by <strong>Redpanda's built-in Schema Registry</strong> (port 8081, Confluent-compatible API). A producer cannot publish a message that breaks any existing consumer version — the Schema Registry rejects the write before the message reaches the broker. No separate Schema Registry service is deployed; the SR is embedded in the Redpanda broker.</p>
+<p><code>BACKWARD_TRANSITIVE</code> (not just <code>BACKWARD</code>) means any consumer schema version can read any historical message, including the full topic log. This makes the Kappa reprocessing guarantee complete: replaying from the earliest offset never encounters an incompatible schema.</p>
 <div class="admonition example">
 <p class="admonition-title">Reference Implementation</p>
 <table>
@@ -1848,6 +1886,14 @@
 <tr>
 <td><a href="https://github.com/naren-chakraview/chakraview-realtime-data-platform/blob/main/contracts/schemas/inventory-updated-v1.avsc"><code>contracts/schemas/inventory-updated-v1.avsc</code></a></td>
 <td>CDC envelope schema: <code>operation</code> enum, <code>before</code>/<code>after</code> union types, <code>source.lsn</code> for WAL ordering</td>
+</tr>
+<tr>
+<td><a href="https://github.com/naren-chakraview/chakraview-realtime-data-platform/blob/main/contracts/schemas/outbox-event-v1.avsc"><code>contracts/schemas/outbox-event-v1.avsc</code></a></td>
+<td>Outbox envelope schema for sources without WAL CDC support</td>
+</tr>
+<tr>
+<td><a href="https://github.com/naren-chakraview/chakraview-realtime-data-platform/blob/main/infrastructure/redpanda/redpanda-cluster.yaml"><code>infrastructure/redpanda/redpanda-cluster.yaml</code></a></td>
+<td>Redpanda cluster with built-in SR — <code>schema_registry_replication_factor: 3</code></td>
 </tr>
 </tbody>
 </table>
