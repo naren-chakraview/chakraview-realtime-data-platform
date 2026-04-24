@@ -2008,6 +2008,7 @@
     WM["Watermarking\nevent-time windows"]
     DLQ["Dead Letter Queue\nside output — never drop"]
     DP["Data Product\nownership + SLA"]
+    GOV["Data Governance\nquality · observability · lineage"]
 
     CDC --&gt;|"Avro messages"| SR
     SR --&gt;|"schema-governed topics"| KAPPA
@@ -2018,6 +2019,8 @@
     MED --&gt;|"Silver validation to"| DLQ
     DP --&gt;|"defines Gold schema\nand freshness SLA for"| MED
     DP --&gt;|"sets Kafka retention\nfor"| KAPPA
+    MED --&gt;|"quality scores\nvolume metrics\nlineage events"| GOV
+    DLQ --&gt;|"correlated via\nsample_failure_ids"| GOV
 
     style CDC fill:#0f766e,color:#fff
     style SR fill:#0f766e,color:#fff
@@ -2026,7 +2029,8 @@
     style EO fill:#92400e,color:#fff
     style WM fill:#92400e,color:#fff
     style DLQ fill:#7f1d1d,color:#fff
-    style DP fill:#14532d,color:#fff</code></pre>
+    style DP fill:#14532d,color:#fff
+    style GOV fill:#4a044e,color:#fff</code></pre>
 
 
 

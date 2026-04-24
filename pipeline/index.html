@@ -1801,15 +1801,22 @@
     B["Iceberg Bronze Sink\nraw CDC · append only"]
     S["Iceberg Silver Sink\nenvelope-unwrapped\ndeduped"]
     DLQ["DLQ Side Output\nfailure_stage · failure_reason\nraw_payload preserved"]
+    QP["QualityProfiler\n60s tumbling window\nside output — non-gating"]
+    QR["governance/quality_results\nIceberg · DuckDB queryable"]
 
     K --&gt; W --&gt; V
     V --&gt;|"valid"| B
     V --&gt;|"valid"| S
     V --&gt;|"invalid"| DLQ
+    S --&gt;|"side branch"| QP --&gt; QR
 
     style B fill:#92400e,color:#fff
     style S fill:#1e3a5f,color:#fff
-    style DLQ fill:#7f1d1d,color:#fff</code></pre>
+    style DLQ fill:#7f1d1d,color:#fff
+    style QP fill:#4a044e,color:#fff
+    style QR fill:#4a044e,color:#fff</code></pre>
+<p>The <code>QualityProfiler</code> runs as a <strong>separate window branch</strong> — it never delays the Silver write path. It evaluates all rules from <a href="https://github.com/naren-chakraview/chakraview-realtime-data-platform/blob/main/governance/quality/quality_rules.yaml"><code>governance/quality/quality_rules.yaml</code></a> against each 60-second batch and writes quality scores to the governance Iceberg table.</p>
+<p><a href="../governance/"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.22 19.03a.75.75 0 0 1 0-1.06L18.19 13H3.75a.75.75 0 0 1 0-1.5h14.44l-4.97-4.97a.749.749 0 0 1 .326-1.275.75.75 0 0 1 .734.215l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0"/></svg></span> Data Governance</a></p>
 <h3 id="watermark-strategy">Watermark Strategy<a class="headerlink" href="#watermark-strategy" title="Permanent link">&para;</a></h3>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">watermark_strategy</span> <span class="o">=</span> <span class="p">(</span>
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    <span class="n">WatermarkStrategy</span>

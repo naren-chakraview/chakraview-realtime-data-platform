@@ -1623,6 +1623,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#governance-layer-quality-and-volume-observability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Governance Layer — Quality and Volume Observability
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1844,6 +1855,42 @@
 </span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>├── freshness-sla.json       # Bronze/Silver/Gold freshness gauges + error budget burn
 </span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>└── dlq-audit.json           # Hourly DLQ counts by stage and reason
 </span></code></pre></div>
+<hr />
+<h2 id="governance-layer-quality-and-volume-observability">Governance Layer — Quality and Volume Observability<a class="headerlink" href="#governance-layer-quality-and-volume-observability" title="Permanent link">&para;</a></h2>
+<p>The SLOs above measure <strong>when</strong> data arrives. The governance layer measures <strong>whether the data is correct</strong> and <strong>whether volumes are behaving normally</strong>. The two are complementary: a freshness SLA can be green while 6% of Silver records silently fail a business rule.</p>
+<table>
+<thead>
+<tr>
+<th>Observability layer</th>
+<th>What it watches</th>
+<th>Where results go</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Freshness SLOs (this page)</td>
+<td>Time from WAL commit to Gold table</td>
+<td>Prometheus → PagerDuty</td>
+</tr>
+<tr>
+<td>Quality checks</td>
+<td>Per-rule pass rates at each pipeline stage</td>
+<td><code>governance/quality_results/</code> Iceberg</td>
+</tr>
+<tr>
+<td>Volume monitor</td>
+<td>Row counts and distribution Z-scores</td>
+<td><code>governance/observability_metrics/</code> Iceberg</td>
+</tr>
+<tr>
+<td>Schema drift</td>
+<td>Iceberg schema fingerprint changes</td>
+<td><code>governance/schema_drift_events/</code> Iceberg</td>
+</tr>
+</tbody>
+</table>
+<p>The <strong>quality waterfall</strong> query in <a href="https://github.com/naren-chakraview/chakraview-realtime-data-platform/blob/main/governance/dashboards/quality_overview.sql"><code>governance/dashboards/quality_overview.sql</code></a> is the primary instability visualization — it shows quality scores at each stage in order so degradation is immediately locatable.</p>
+<p><a href="../governance/"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.22 19.03a.75.75 0 0 1 0-1.06L18.19 13H3.75a.75.75 0 0 1 0-1.5h14.44l-4.97-4.97a.749.749 0 0 1 .326-1.275.75.75 0 0 1 .734.215l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0"/></svg></span> Data Governance</a></p>
 <p>The freshness SLA dashboard is the on-call view: it shows the current staleness of each medallion layer against its SLA threshold in green/amber/red. An amber state means the slow-burn alert has fired but the fast-burn has not — the on-call team has ~30 minutes before page escalation.</p>
 
 

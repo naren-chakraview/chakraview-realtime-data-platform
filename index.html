@@ -604,6 +604,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#data-governance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Data Governance
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1720,6 +1731,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#data-governance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Data Governance
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1782,10 +1804,16 @@
 <p><a href="adrs/ADR-0005-duckdb-serving-layer/"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.22 19.03a.75.75 0 0 1 0-1.06L18.19 13H3.75a.75.75 0 0 1 0-1.5h14.44l-4.97-4.97a.749.749 0 0 1 .326-1.275.75.75 0 0 1 .734.215l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0"/></svg></span> ADR-0005</a></p>
 </li>
 <li>
-<p><span class="twemoji lg middle"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m10 17-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9m-6-8L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5z"/></svg></span> <strong>8 Patterns, 8 ADRs</strong></p>
+<p><span class="twemoji lg middle"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m10 17-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9m-6-8L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5z"/></svg></span> <strong>8 Patterns, 9 ADRs</strong></p>
 <hr />
 <p>CDC, Kappa, Medallion, Schema Registry, exactly-once semantics, watermarking, DLQ, and data product ownership — each backed by an accepted ADR.</p>
 <p><a href="patterns/"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.22 19.03a.75.75 0 0 1 0-1.06L18.19 13H3.75a.75.75 0 0 1 0-1.5h14.44l-4.97-4.97a.749.749 0 0 1 .326-1.275.75.75 0 0 1 .734.215l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0"/></svg></span> Pattern Catalogue</a></p>
+</li>
+<li>
+<p><span class="twemoji lg middle"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m3 14 .5.07L8.07 9.5a1.95 1.95 0 0 1 .52-1.91c.78-.79 2.04-.79 2.82 0 .53.52.7 1.26.52 1.91l2.57 2.57.5-.07c.18 0 .35 0 .5.07l3.57-3.57C19 8.35 19 8.18 19 8a2 2 0 0 1 2-2 2 2 0 0 1 2 2 2 2 0 0 1-2 2c-.18 0-.35 0-.5-.07l-3.57 3.57c.07.15.07.32.07.5a2 2 0 0 1-2 2 2 2 0 0 1-2-2l.07-.5-2.57-2.57c-.32.07-.68.07-1 0L4.93 15.5 5 16a2 2 0 0 1-2 2 2 2 0 0 1-2-2 2 2 0 0 1 2-2"/></svg></span> <strong>Data Governance</strong></p>
+<hr />
+<p>Quality checks, volume anomaly detection, and column-level lineage — stored as Iceberg tables and queryable by DuckDB. Pinpoint pipeline instability with the quality waterfall.</p>
+<p><a href="governance/"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.22 19.03a.75.75 0 0 1 0-1.06L18.19 13H3.75a.75.75 0 0 1 0-1.5h14.44l-4.97-4.97a.749.749 0 0 1 .326-1.275.75.75 0 0 1 .734.215l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0"/></svg></span> Governance</a></p>
 </li>
 </ul>
 </div>
@@ -1801,6 +1829,7 @@
     E3["Gold\naggregated · serving · 2-year"]
     F1["DuckDB\nanalysts · notebooks"]
     F2["AWS Athena\nBI tools · high concurrency"]
+    G["Governance\nquality · observability · lineage"]
 
     A --&gt;|"sub-second"| B
     B --&gt;|"&lt; 30s to Bronze"| C
@@ -1810,12 +1839,14 @@
     E2 --&gt;|"&lt; 5 min"| E3
     E3 --&gt; F1
     E3 -.-&gt;|"production scale\n(ADR-0005)"| F2
+    E1 &amp; E2 &amp; E3 -.-&gt;|"volume · quality\nlineage · drift"| G
 
     style E1 fill:#92400e,color:#fff
     style E2 fill:#1e3a5f,color:#fff
     style E3 fill:#14532d,color:#fff
     style F1 fill:#0f766e,color:#fff
-    style F2 fill:#374151,color:#fff</code></pre>
+    style F2 fill:#374151,color:#fff
+    style G fill:#4a044e,color:#fff</code></pre>
 <hr />
 <h2 id="the-contract-first-model">The Contract-First Model<a class="headerlink" href="#the-contract-first-model" title="Permanent link">&para;</a></h2>
 <p><code>contracts/</code> is the only directory domain teams author directly. Everything downstream is derived or generated.</p>
@@ -1881,6 +1912,32 @@
 </table>
 <p>A single SLA breach — Gold data older than 5 minutes — triggers a multi-window burn rate alert at the same rates used in the enterprise modernization SLOs (14.4× fast burn, 6× slow burn).</p>
 <p><a href="observability/"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.22 19.03a.75.75 0 0 1 0-1.06L18.19 13H3.75a.75.75 0 0 1 0-1.5h14.44l-4.97-4.97a.749.749 0 0 1 .326-1.275.75.75 0 0 1 .734.215l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0"/></svg></span> Observability setup</a></p>
+<hr />
+<h2 id="data-governance">Data Governance<a class="headerlink" href="#data-governance" title="Permanent link">&para;</a></h2>
+<p>Quality checks, volume monitoring, and column-level lineage run alongside every pipeline stage and store results as Iceberg tables — queryable by DuckDB alongside the medallion data.</p>
+<table>
+<thead>
+<tr>
+<th>Layer</th>
+<th>What is measured</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Quality</td>
+<td>Per-rule pass rate every 60 seconds; quality waterfall across Bronze → Silver → Gold</td>
+</tr>
+<tr>
+<td>Observability</td>
+<td>Row count Z-score, null rates, distribution drift, schema fingerprint comparison</td>
+</tr>
+<tr>
+<td>Lineage</td>
+<td>Column-level source→Gold map; forward impact and backward root-cause queries</td>
+</tr>
+</tbody>
+</table>
+<p><a href="governance/"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.22 19.03a.75.75 0 0 1 0-1.06L18.19 13H3.75a.75.75 0 0 1 0-1.5h14.44l-4.97-4.97a.749.749 0 0 1 .326-1.275.75.75 0 0 1 .734.215l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0"/></svg></span> Governance</a> · <a href="adrs/ADR-0009-data-governance/"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.22 19.03a.75.75 0 0 1 0-1.06L18.19 13H3.75a.75.75 0 0 1 0-1.5h14.44l-4.97-4.97a.749.749 0 0 1 .326-1.275.75.75 0 0 1 .734.215l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0"/></svg></span> ADR-0009</a></p>
 
 
 
