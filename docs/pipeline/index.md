@@ -69,16 +69,25 @@ flowchart LR
     B["Iceberg Bronze Sink\nraw CDC · append only"]
     S["Iceberg Silver Sink\nenvelope-unwrapped\ndeduped"]
     DLQ["DLQ Side Output\nfailure_stage · failure_reason\nraw_payload preserved"]
+    QP["QualityProfiler\n60s tumbling window\nside output — non-gating"]
+    QR["governance/quality_results\nIceberg · DuckDB queryable"]
 
     K --> W --> V
     V -->|"valid"| B
     V -->|"valid"| S
     V -->|"invalid"| DLQ
+    S -->|"side branch"| QP --> QR
 
     style B fill:#92400e,color:#fff
     style S fill:#1e3a5f,color:#fff
     style DLQ fill:#7f1d1d,color:#fff
+    style QP fill:#4a044e,color:#fff
+    style QR fill:#4a044e,color:#fff
 ```
+
+The `QualityProfiler` runs as a **separate window branch** — it never delays the Silver write path. It evaluates all rules from [`governance/quality/quality_rules.yaml`](https://github.com/naren-chakraview/chakraview-realtime-data-platform/blob/main/governance/quality/quality_rules.yaml) against each 60-second batch and writes quality scores to the governance Iceberg table.
+
+[:octicons-arrow-right-24: Data Governance](../governance/index.md)
 
 ### Watermark Strategy
 

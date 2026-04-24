@@ -243,6 +243,7 @@ graph TD
     WM["Watermarking\nevent-time windows"]
     DLQ["Dead Letter Queue\nside output — never drop"]
     DP["Data Product\nownership + SLA"]
+    GOV["Data Governance\nquality · observability · lineage"]
 
     CDC -->|"Avro messages"| SR
     SR -->|"schema-governed topics"| KAPPA
@@ -253,6 +254,8 @@ graph TD
     MED -->|"Silver validation to"| DLQ
     DP -->|"defines Gold schema\nand freshness SLA for"| MED
     DP -->|"sets Kafka retention\nfor"| KAPPA
+    MED -->|"quality scores\nvolume metrics\nlineage events"| GOV
+    DLQ -->|"correlated via\nsample_failure_ids"| GOV
 
     style CDC fill:#0f766e,color:#fff
     style SR fill:#0f766e,color:#fff
@@ -262,4 +265,5 @@ graph TD
     style WM fill:#92400e,color:#fff
     style DLQ fill:#7f1d1d,color:#fff
     style DP fill:#14532d,color:#fff
+    style GOV fill:#4a044e,color:#fff
 ```

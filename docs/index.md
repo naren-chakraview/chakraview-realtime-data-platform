@@ -46,13 +46,21 @@ The architecture makes one opinionated choice above all others: **a single strea
 
     [:octicons-arrow-right-24: ADR-0005](adrs/ADR-0005-duckdb-serving-layer.md)
 
--   :material-shield-check:{ .lg .middle } __8 Patterns, 8 ADRs__
+-   :material-shield-check:{ .lg .middle } __8 Patterns, 9 ADRs__
 
     ---
 
     CDC, Kappa, Medallion, Schema Registry, exactly-once semantics, watermarking, DLQ, and data product ownership — each backed by an accepted ADR.
 
     [:octicons-arrow-right-24: Pattern Catalogue](patterns/index.md)
+
+-   :material-chart-timeline-variant:{ .lg .middle } __Data Governance__
+
+    ---
+
+    Quality checks, volume anomaly detection, and column-level lineage — stored as Iceberg tables and queryable by DuckDB. Pinpoint pipeline instability with the quality waterfall.
+
+    [:octicons-arrow-right-24: Governance](governance/index.md)
 
 </div>
 
@@ -71,6 +79,7 @@ flowchart LR
     E3["Gold\naggregated · serving · 2-year"]
     F1["DuckDB\nanalysts · notebooks"]
     F2["AWS Athena\nBI tools · high concurrency"]
+    G["Governance\nquality · observability · lineage"]
 
     A -->|"sub-second"| B
     B -->|"< 30s to Bronze"| C
@@ -80,12 +89,14 @@ flowchart LR
     E2 -->|"< 5 min"| E3
     E3 --> F1
     E3 -.->|"production scale\n(ADR-0005)"| F2
+    E1 & E2 & E3 -.->|"volume · quality\nlineage · drift"| G
 
     style E1 fill:#92400e,color:#fff
     style E2 fill:#1e3a5f,color:#fff
     style E3 fill:#14532d,color:#fff
     style F1 fill:#0f766e,color:#fff
     style F2 fill:#374151,color:#fff
+    style G fill:#4a044e,color:#fff
 ```
 
 ---
@@ -119,3 +130,17 @@ Every layer has a machine-readable SLA target in `contracts/data-products/`. The
 A single SLA breach — Gold data older than 5 minutes — triggers a multi-window burn rate alert at the same rates used in the enterprise modernization SLOs (14.4× fast burn, 6× slow burn).
 
 [:octicons-arrow-right-24: Observability setup](observability/index.md)
+
+---
+
+## Data Governance
+
+Quality checks, volume monitoring, and column-level lineage run alongside every pipeline stage and store results as Iceberg tables — queryable by DuckDB alongside the medallion data.
+
+| Layer | What is measured |
+|---|---|
+| Quality | Per-rule pass rate every 60 seconds; quality waterfall across Bronze → Silver → Gold |
+| Observability | Row count Z-score, null rates, distribution drift, schema fingerprint comparison |
+| Lineage | Column-level source→Gold map; forward impact and backward root-cause queries |
+
+[:octicons-arrow-right-24: Governance](governance/index.md) · [:octicons-arrow-right-24: ADR-0009](adrs/ADR-0009-data-governance.md)

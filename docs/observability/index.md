@@ -157,4 +157,21 @@ observability/dashboards/
 └── dlq-audit.json           # Hourly DLQ counts by stage and reason
 ```
 
+---
+
+## Governance Layer — Quality and Volume Observability
+
+The SLOs above measure **when** data arrives. The governance layer measures **whether the data is correct** and **whether volumes are behaving normally**. The two are complementary: a freshness SLA can be green while 6% of Silver records silently fail a business rule.
+
+| Observability layer | What it watches | Where results go |
+|---|---|---|
+| Freshness SLOs (this page) | Time from WAL commit to Gold table | Prometheus → PagerDuty |
+| Quality checks | Per-rule pass rates at each pipeline stage | `governance/quality_results/` Iceberg |
+| Volume monitor | Row counts and distribution Z-scores | `governance/observability_metrics/` Iceberg |
+| Schema drift | Iceberg schema fingerprint changes | `governance/schema_drift_events/` Iceberg |
+
+The **quality waterfall** query in [`governance/dashboards/quality_overview.sql`](https://github.com/naren-chakraview/chakraview-realtime-data-platform/blob/main/governance/dashboards/quality_overview.sql) is the primary instability visualization — it shows quality scores at each stage in order so degradation is immediately locatable.
+
+[:octicons-arrow-right-24: Data Governance](../governance/index.md)
+
 The freshness SLA dashboard is the on-call view: it shows the current staleness of each medallion layer against its SLA threshold in green/amber/red. An amber state means the slow-burn alert has fired but the fast-burn has not — the on-call team has ~30 minutes before page escalation.
